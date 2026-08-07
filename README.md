@@ -1,17 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+これは [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) で作成された [Next.js](https://nextjs.org) プロジェクトです。
 
-## Setup after cloning
+## クローン後のセットアップ
 
-This repo uses pnpm and a Dev Container. `.pnpm-store`, `node_modules`, and other build artifacts are gitignored and are **not** committed — you need to install dependencies yourself after cloning.
+このリポジトリは pnpm と Dev Container を使用しています。`.pnpm-store` や `node_modules` などのビルド成果物は `.gitignore` の対象で、リポジトリには**コミットされていません**。クローン後は自分で依存関係をインストールする必要があります。
 
-### Option A: VS Code Dev Containers (recommended)
+### 方法A: VS Code Dev Containers（推奨）
 
-1. Clone the repo and open it in VS Code.
-2. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) if you don't have it.
-3. Run **Dev Containers: Reopen in Container**. This builds the Docker image and automatically runs `pnpm install` (via `postCreateCommand` in `.devcontainer/devcontainer.json`).
-4. Once the container is ready, run `pnpm dev` in the integrated terminal.
+1. リポジトリをクローンし、VS Code で開く。
+2. [Dev Containers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) をインストールしていない場合はインストールする。
+3. **Dev Containers: Reopen in Container** を実行する。Docker イメージがビルドされ、`.devcontainer/devcontainer.json` の `postCreateCommand` によって自動的に `pnpm install` が実行される。
+4. コンテナの準備ができたら、統合ターミナルで `pnpm dev` を実行する。
 
-### Option B: Docker Compose
+### 方法B: Docker Compose
 
 ```bash
 docker compose up -d
@@ -19,7 +19,7 @@ docker compose exec app pnpm install
 docker compose exec app pnpm dev
 ```
 
-### Option C: Local Node/pnpm
+### 方法C: ローカルの Node/pnpm
 
 ```bash
 corepack enable
@@ -28,37 +28,37 @@ pnpm install
 pnpm dev
 ```
 
-## Getting Started
+## はじめに
 
-First, run the development server:
+まず、開発サーバーを起動します。
 
 ```bash
 npm run dev
-# or
+# または
 yarn dev
-# or
+# または
 pnpm dev
-# or
+# または
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開くと結果が確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`app/page.tsx` を編集することでページの編集を開始できます。ファイルを編集するとページは自動的に更新されます。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+このプロジェクトでは、Vercel の新しいフォントファミリーである [Geist](https://vercel.com/font) を自動的に最適化して読み込むために [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) を使用しています。
 
-## Learn More
+## 詳しく学ぶ
 
-To learn more about Next.js, take a look at the following resources:
+Next.js についてさらに詳しく知りたい場合は、以下のリソースを参照してください。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js の機能や API について学べます。
+- [Learn Next.js](https://nextjs.org/learn) - インタラクティブな Next.js チュートリアルです。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[Next.js の GitHub リポジトリ](https://github.com/vercel/next.js) もぜひご覧ください。フィードバックやコントリビューションを歓迎しています。
 
-## Deploy on Vercel
+## Vercel へのデプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.js アプリをデプロイする最も簡単な方法は、Next.js の開発元による [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) を使うことです。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+詳細は [Next.js のデプロイに関するドキュメント](https://nextjs.org/docs/app/building-your-application/deploying) を参照してください。
