@@ -9,6 +9,19 @@ services:
     ports:
       - "3000:3000"
     command: sleep infinity         # Dev Container 用に待機させる
+    depends_on:
+      - db                          # db を先に起動する
+
+  db:
+    image: postgres:18
+    container_name: next-training-db
+    environment:
+      POSTGRES_USER: postgres       # 初回起動時に作られるユーザー
+      POSTGRES_PASSWORD: postgres   # そのパスワード(ローカル開発専用)
+      POSTGRES_DB: next_training    # 初回起動時に作られるデータベース名
+    volumes:
+      - db_data:/var/lib/postgresql  # データを永続化(18+ は /data を付けない)
 
 volumes:
   node_modules:
+  db_data:
