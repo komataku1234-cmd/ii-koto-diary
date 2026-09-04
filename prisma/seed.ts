@@ -7,6 +7,7 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
+  await prisma.reply.deleteMany();
   await prisma.reaction.deleteMany();
   await prisma.post.deleteMany();
   await prisma.reactionType.deleteMany();
@@ -26,6 +27,11 @@ async function main() {
       reactions: {
         create: [{ reactionTypeId: good.id }, { reactionTypeId: hokkori.id }],
       },
+      replies: {
+        create: [
+          { nickname: "きつね", content: "いいことしましたね、ほっこりします。" },
+        ],
+      },
     },
   });
 
@@ -35,6 +41,12 @@ async function main() {
       content: "コンビニのレジで店員さんが「今日も一日お疲れ様です」って言ってくれた。",
       reactions: {
         create: [{ reactionTypeId: wakaru.id }],
+      },
+      replies: {
+        create: [
+          { nickname: null, content: "わかります、それだけで元気出ますよね。" },
+          { nickname: "うさぎ", content: "私も同じことありました!" },
+        ],
       },
     },
   });

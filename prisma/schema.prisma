@@ -21,6 +21,7 @@ model Post {
   deletedAt DateTime?
 
   reactions Reaction[]
+  replies   Reply[]
 }
 
 model ReactionType {
@@ -38,5 +39,15 @@ model Reaction {
   reactionTypeId Int
   reactionType   ReactionType @relation(fields: [reactionTypeId], references: [id])
   createdAt      DateTime @default(now())
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  nickname  String?
+  content   String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
 }
 
