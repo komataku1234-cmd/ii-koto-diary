@@ -18,7 +18,7 @@ export default async function Home() {
       },
       replies: {
         where: { deletedAt: null },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "asc" }, // 投稿は新着順だが、コメントは会話の流れが分かるよう古い順にする
       },
     },
   });
@@ -32,10 +32,9 @@ export default async function Home() {
       ) : (
         <ul className="flex flex-col gap-3">
           {posts.map((post) => {
-            const reactionCounts = new Map<
-              number,
-              { emoji: string; name: string; count: number }
-            >();
+            // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
+            // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
+            const reactionCounts = new Map<number,{ emoji: string; name: string; count: number }>();
             for (const reaction of post.reactions) {
               const current = reactionCounts.get(reaction.reactionTypeId);
               if (current) {
@@ -60,7 +59,7 @@ export default async function Home() {
                   </span>
                   <time
                     className="shrink-0 text-xs text-slate-400"
-                    dateTime={post.createdAt.toISOString()}
+                    dateTime={post.createdAt.toISOString()} //スクリーンリーダー利用者向けのアクセシビリティ配慮
                   >
                     {dateFormatter.format(post.createdAt)}
                   </time>
@@ -70,6 +69,7 @@ export default async function Home() {
                 </p>
                 {reactionCounts.size > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
+                    {/* Map.values()はイテレータで.mapが使えないため配列に変換してから展開 */}
                     {[...reactionCounts.values()].map((reaction) => (
                       <span
                         key={reaction.name}
