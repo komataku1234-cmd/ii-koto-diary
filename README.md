@@ -1,4 +1,18 @@
-これは [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) で作成された [Next.js](https://nextjs.org) プロジェクトです。
+# ii-koto-diary（匿名「ひとこと日記」共有アプリ）
+
+「今日あったちょっといいこと」を匿名で投稿し、みんなの投稿がタイムライン形式で流れる日記共有アプリです。
+
+- 一般ユーザーはアカウント登録・ログイン不要で投稿・閲覧・リアクションができます。
+- 管理者は固定パスワードでログインし、全投稿の検索・編集・削除（ソフトデリート）を行えます。
+
+詳しい要件は [requirements.md](./requirements.md) を参照してください。
+
+## 技術スタック
+
+- Next.js 16 (App Router, Turbopack)
+- React 19
+- Prisma + PostgreSQL
+- Tailwind CSS
 
 ## クローン後のセットアップ
 
@@ -28,37 +42,12 @@ pnpm install
 pnpm dev
 ```
 
-## はじめに
+セットアップ後、ブラウザで [http://localhost:3001](http://localhost:3001) を開くと確認できます。
 
-まず、開発サーバーを起動します。
+## 環境変数
 
-```bash
-npm run dev
-# または
-yarn dev
-# または
-pnpm dev
-# または
-bun dev
+`.env` に以下を設定してください（ローカル開発用の値の例）。
+
 ```
-
-ブラウザで [http://localhost:3000](http://localhost:3000) を開くと結果が確認できます。
-
-`app/page.tsx` を編集することでページの編集を開始できます。ファイルを編集するとページは自動的に更新されます。
-
-このプロジェクトでは、Vercel の新しいフォントファミリーである [Geist](https://vercel.com/font) を自動的に最適化して読み込むために [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) を使用しています。
-
-## 詳しく学ぶ
-
-Next.js についてさらに詳しく知りたい場合は、以下のリソースを参照してください。
-
-- [Next.js Documentation](https://nextjs.org/docs) - Next.js の機能や API について学べます。
-- [Learn Next.js](https://nextjs.org/learn) - インタラクティブな Next.js チュートリアルです。
-
-[Next.js の GitHub リポジトリ](https://github.com/vercel/next.js) もぜひご覧ください。フィードバックやコントリビューションを歓迎しています。
-
-## Vercel へのデプロイ
-
-Next.js アプリをデプロイする最も簡単な方法は、Next.js の開発元による [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) を使うことです。
-
-詳細は [Next.js のデプロイに関するドキュメント](https://nextjs.org/docs/app/building-your-application/deploying) を参照してください。
+DATABASE_URL="postgresql://postgres:postgres@ii-koto-diary-db:5432/ii_koto_diary"
+```

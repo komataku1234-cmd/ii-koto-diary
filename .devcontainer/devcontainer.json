@@ -1,10 +1,10 @@
 {
-  "name": "next-training",
+  "name": "ii-koto-diary",
   "dockerComposeFile": "../docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/app",
   "shutdownAction": "stopCompose",
-  "forwardPorts": [3000, 5555],
+  "forwardPorts": [3001, 5555],
   "postCreateCommand": "pnpm install",
   "customizations": {
     "vscode": {
