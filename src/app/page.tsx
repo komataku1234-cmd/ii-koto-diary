@@ -77,6 +77,7 @@ export default async function Home({searchParams}: {searchParams: Promise<{ q?: 
             // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
             // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
             // emoji/nameはreactionTypes(マスタ)側から引くので、ここではreactionTypeIdごとの件数だけ持てば十分。
+            //groupBy には include が使えない
             const reactionCounts = new Map<number, number>();
             for (const reaction of post.reactions) {
               reactionCounts.set(
