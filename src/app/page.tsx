@@ -8,9 +8,23 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   minute: "2-digit",
 });
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
+  const { q } = await searchParams;
+  const keyword = q?.trim() || undefined;
+
   const posts = await prisma.post.findMany({
-    where: { deletedAt: null },
+    where: {
+      deletedAt: null,
+      // キーワードが無ければcontains条件自体を付けない(未入力時は全件表示)
+      ...(keyword
+        ? { content: { contains: keyword, mode: "insensitive" } }
+        : {}),
+    },
     orderBy: { createdAt: "desc" },
     include: {
       reactions: {
@@ -27,8 +41,29 @@ export default async function Home() {
     <div className="flex flex-col gap-4">
       <h2 className="text-base font-semibold">タイムライン</h2>
 
+      {/* method="get"のプレーンなformなのでJS無しでも動作し、送信すると/?q=キーワードに遷移する */}
+      <form action="/" method="get" className="flex gap-2">
+        <input
+          type="text"
+          name="q"
+          defaultValue={keyword}
+          placeholder="投稿をキーワードで検索"
+          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
+        />
+        <button
+          type="submit"
+          className="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+        >
+          検索
+        </button>
+      </form>
+
       {posts.length === 0 ? (
-        <p className="text-sm text-slate-500">投稿はまだありません。</p>
+        <p className="text-sm text-slate-500">
+          {keyword
+            ? `「${keyword}」に一致する投稿は見つかりませんでした。`
+            : "投稿はまだありません。"}
+        </p>
       ) : (
         <ul className="flex flex-col gap-3">
           {posts.map((post) => {
