@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -10,6 +12,11 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
 });
 
 export default async function AdminPage() {
+  // 未認証なら一覧を取得する前にログイン画面へ飛ばす
+  if (!(await isAdminAuthenticated())) {
+    redirect("/admin/login");
+  }
+
   // 管理画面は削除済みも含めて検索・確認できる必要があるため、deletedAtで絞り込まず全件取得する
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },

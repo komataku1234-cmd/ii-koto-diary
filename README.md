@@ -50,4 +50,7 @@ pnpm dev
 
 ```
 DATABASE_URL="postgresql://postgres:postgres@ii-koto-diary-db:5432/ii_koto_diary"
+ADMIN_PASSWORD="任意の管理者用パスワード"
 ```
+
+`ADMIN_PASSWORD` は管理者画面(`/admin`)のログインに使う固定パスワードです。
