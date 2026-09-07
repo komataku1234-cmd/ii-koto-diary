@@ -20,9 +20,15 @@ export default async function Home({
   const posts = await prisma.post.findMany({
     where: {
       deletedAt: null,
-      // キーワードが無ければcontains条件自体を付けない(未入力時は全件表示)
+      // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
+      // 本文・ニックネームのどちらかに部分一致すればヒットさせる
       ...(keyword
-        ? { content: { contains: keyword, mode: "insensitive" } }
+        ? {
+            OR: [
+              { content: { contains: keyword, mode: "insensitive" } },
+              { nickname: { contains: keyword, mode: "insensitive" } },
+            ],
+          }
         : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -47,7 +53,7 @@ export default async function Home({
           type="text"
           name="q"
           defaultValue={keyword}
-          placeholder="投稿をキーワードで検索"
+          placeholder="本文・ニックネームで検索"
           className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
         <button
