@@ -8,13 +8,11 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   minute: "2-digit",
 });
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
+export default async function Home({searchParams}: {searchParams: Promise<{ q?: string }>}) {
   // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
+  //分割代入
   const { q } = await searchParams;
+  //falsy全部
   const keyword = q?.trim() || undefined;
 
   const posts = await prisma.post.findMany({
