@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -16,7 +17,12 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-base font-semibold">管理者画面 - 投稿一覧</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold">管理者画面 - 投稿一覧</h2>
+        <Link href="/" className="text-sm text-slate-500 hover:underline">
+          ← タイムラインに戻る
+        </Link>
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
         <table className="w-full text-left text-sm">
