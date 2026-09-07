@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { addReaction } from "./actions";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -15,31 +16,33 @@ export default async function Home({searchParams}: {searchParams: Promise<{ q?: 
   //falsy全部
   const keyword = q?.trim() || undefined;
 
-  const posts = await prisma.post.findMany({
-    where: {
-      deletedAt: null,
-      // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
-      // 本文・ニックネームのどちらかに部分一致すればヒットさせる
-      ...(keyword
-        ? {
-            OR: [
-              { content: { contains: keyword, mode: "insensitive" } },
-              { nickname: { contains: keyword, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      reactions: {
-        include: { reactionType: true },
+  // 投稿一覧とリアクション種類マスタは互いに依存しないので並行して取得する
+  const [posts, reactionTypes] = await Promise.all([
+    prisma.post.findMany({
+      where: {
+        deletedAt: null,
+        // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
+        // 本文・ニックネームのどちらかに部分一致すればヒットさせる
+        ...(keyword
+          ? {
+              OR: [
+                { content: { contains: keyword, mode: "insensitive" } },
+                { nickname: { contains: keyword, mode: "insensitive" } },
+              ],
+            }
+          : {}),
       },
-      replies: {
-        where: { deletedAt: null },
-        orderBy: { createdAt: "asc" }, // 投稿は新着順だが、コメントは会話の流れが分かるよう古い順にする
+      orderBy: { createdAt: "desc" },
+      include: {
+        reactions: true,
+        replies: {
+          where: { deletedAt: null },
+          orderBy: { createdAt: "asc" }, // 投稿は新着順だが、コメントは会話の流れが分かるよう古い順にする
+        },
       },
-    },
-  });
+    }),
+    prisma.reactionType.findMany({ orderBy: { id: "asc" } }),
+  ]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,18 +76,13 @@ export default async function Home({searchParams}: {searchParams: Promise<{ q?: 
           {posts.map((post) => {
             // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
             // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
-            const reactionCounts = new Map<number,{ emoji: string; name: string; count: number }>();
+            // emoji/nameはreactionTypes(マスタ)側から引くので、ここではreactionTypeIdごとの件数だけ持てば十分。
+            const reactionCounts = new Map<number, number>();
             for (const reaction of post.reactions) {
-              const current = reactionCounts.get(reaction.reactionTypeId);
-              if (current) {
-                current.count += 1;
-              } else {
-                reactionCounts.set(reaction.reactionTypeId, {
-                  emoji: reaction.reactionType.emoji,
-                  name: reaction.reactionType.name,
-                  count: 1,
-                });
-              }
+              reactionCounts.set(
+                reaction.reactionTypeId,
+                (reactionCounts.get(reaction.reactionTypeId) ?? 0) + 1
+              );
             }
 
             return (
@@ -106,19 +104,26 @@ export default async function Home({searchParams}: {searchParams: Promise<{ q?: 
                 <p className="mt-2 whitespace-pre-wrap text-sm">
                   {post.content}
                 </p>
-                {reactionCounts.size > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {/* Map.values()はイテレータで.mapが使えないため配列に変換してから展開 */}
-                    {[...reactionCounts.values()].map((reaction) => (
-                      <span
-                        key={reaction.name}
-                        className="rounded-full bg-slate-100 px-2 py-1 text-xs"
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {/* 押されていない種類も0件のボタンとして常に表示し、押せるようにする */}
+                  {reactionTypes.map((reactionType) => (
+                    <form key={reactionType.id} action={addReaction}>
+                      <input type="hidden" name="postId" value={post.id} />
+                      <input
+                        type="hidden"
+                        name="reactionTypeId"
+                        value={reactionType.id}
+                      />
+                      <button
+                        type="submit"
+                        className="rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
                       >
-                        {reaction.emoji} {reaction.count}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                        {reactionType.emoji}{" "}
+                        {reactionCounts.get(reactionType.id) ?? 0}
+                      </button>
+                    </form>
+                  ))}
+                </div>
                 {post.replies.length > 0 && (
                   <ul className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
                     {post.replies.map((reply) => (
