@@ -55,14 +55,19 @@ export default async function Home({
   // 特定の絵文字(リアクション種類)が多い順のときだけ、取得済みのpostsをJS側で並び替える。
   // Prismaのリレーション件数ソート(_count)は「全種類合計」しか数えられず、
   // 「この絵文字だけの件数」でソートする方法が無いため、JSで数えて並び替えている。
+  // Number.isIntegerのチェックが無いと、?sort=abc のような不正な値で
+  // Number("abc")=NaNになった場合もif文を素通りしてしまう
+  // (NaNはundefinedではないため)。並び替え自体が無意味になるので念のため弾く。
   if (sortReactionTypeId !== undefined && Number.isInteger(sortReactionTypeId)) {
     posts.sort((a, b) => {
+      // 投稿ごとに「選ばれた絵文字と一致するリアクション」だけ数える
       const countA = a.reactions.filter(
         (r) => r.reactionTypeId === sortReactionTypeId
       ).length;
       const countB = b.reactions.filter(
         (r) => r.reactionTypeId === sortReactionTypeId
       ).length;
+      // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる
       return countB - countA;
     });
   }
