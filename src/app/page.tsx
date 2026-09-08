@@ -31,19 +31,19 @@ export default async function Home({
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
         // 本文・ニックネームのどちらかに部分一致すればヒットさせる
-        ...(keyword
-          ? {
+        ...(keyword? 
+            {
               OR: [
                 { content: { contains: keyword, mode: "insensitive" } },
                 { nickname: { contains: keyword, mode: "insensitive" } },
               ],
             }
-          : {}),
+            : {}),
       },
       orderBy: { createdAt: "desc" },
       include: {
-        reactions: true,
-        replies: {
+        reactions: true,//全部取得
+        replies: {//条件付きで取得
           where: { deletedAt: null },
           orderBy: { createdAt: "asc" }, // 投稿は新着順だが、コメントは会話の流れが分かるよう古い順にする
         },
