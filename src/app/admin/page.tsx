@@ -10,6 +10,7 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   day: "2-digit",
   hour: "2-digit",
   minute: "2-digit",
+  timeZone: "Asia/Tokyo", // サーバー(コンテナ)のタイムゾーンがUTCなので、表示だけ日本時間に変換する
 });
 
 export default async function AdminPage() {
