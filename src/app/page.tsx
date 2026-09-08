@@ -162,7 +162,7 @@ export default async function Home({
                     name="nickname"
                     maxLength={20}
                     placeholder="名無しさん"
-                    className="rounded-md border border-slate-300 px-2 py-1 text-xs"
+                    className="w-32 self-start rounded-md border border-slate-300 px-2 py-1 text-xs"
                   />
                   <div className="flex gap-2">
                     <input
