@@ -11,6 +11,12 @@ export async function deletePost(formData: FormData) {
   // リクエストの形を真似て直接POSTするだけでも実行できてしまうため、
   // ページ側のガードを素通りされる。呼び出し元に関わらず弾けるよう、
   // この関数自身の中でも認証を確認する(多層防御)。
+  // ページ(admin/page.tsx等)側はredirectでログイン画面に案内するが、
+  // ここ(Server Action)ではthrowで拒否する:未認証でのページアクセスは
+  // 画面遷移として普通に起こりうるのでredirectが自然だが、Server Actionは
+  // 正規のUIなら認証済み画面の中にしかボタン/フォームが無いはずで、
+  // 未認証で呼ばれるのは画面を経由しない直接操作(curl等)がほとんど。
+  // その異常な操作をredirectでスムーズに流さず、拒否として明確にthrowしている。
   if (!(await isAdminAuthenticated())) {
     throw new Error("権限がありません。");
   }
@@ -31,7 +37,7 @@ export async function deletePost(formData: FormData) {
 }
 
 export async function updatePost(formData: FormData) {
-  // deletePostと同じ理由(直接POSTされうる)で、ここでも改めて認証を確認する
+  // deletePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
   if (!(await isAdminAuthenticated())) {
     throw new Error("権限がありません。");
   }
