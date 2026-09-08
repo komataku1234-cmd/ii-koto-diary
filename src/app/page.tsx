@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { addReaction } from "./actions";
+import { addReaction, createReply } from "./actions";
 import { SearchSortForm } from "./SearchSortForm";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -152,6 +152,35 @@ export default async function Home({
                     ))}
                   </ul>
                 )}
+                <form
+                  action={createReply}
+                  className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3"
+                >
+                  <input type="hidden" name="postId" value={post.id} />
+                  <input
+                    type="text"
+                    name="nickname"
+                    maxLength={20}
+                    placeholder="名無しさん"
+                    className="rounded-md border border-slate-300 px-2 py-1 text-xs"
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="content"
+                      required
+                      maxLength={140}
+                      placeholder="コメントする"
+                      className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
+                    />
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white"
+                    >
+                      送信
+                    </button>
+                  </div>
+                </form>
               </li>
             );
           })}
