@@ -74,7 +74,7 @@ export default async function AdminPage() {
                       >
                         編集
                       </Link>
-                      <form action={deletePost}>
+                      <form action={deletePost} className="contents">
                         <input type="hidden" name="postId" value={post.id} />
                         <button
                           type="submit"
