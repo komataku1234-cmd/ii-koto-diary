@@ -19,10 +19,10 @@ export async function isAdminAuthenticated() {
 export async function setAdminAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_COOKIE_NAME, adminAuthToken(), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: ADMIN_COOKIE_MAX_AGE,
-    path: "/",
+    httpOnly: true, // JSから読めなくしてXSSでの値の盗み見を防ぐ
+    secure: process.env.NODE_ENV === "production", // 本番はHTTPS限定で盗聴を防ぐ(ローカル開発はhttpなのでdevでは無効化)
+    sameSite: "lax", // 他サイトからの裏側のリクエストには付けずCSRFを防ぐ
+    maxAge: ADMIN_COOKIE_MAX_AGE, // この時間が経つと自動失効し、要件通り再ログインが必要になる
+    path: "/", // サイト全体でこのCookieを有効にする
   });
 }
