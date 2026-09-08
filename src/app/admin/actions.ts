@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 
-export async function deletePost(formData: FormData) {
+async function deletePost(formData: FormData) {
   // admin/page.tsxのisAdminAuthenticatedチェックは「ページを描画するとき」にしか働かない。
   // Server Actionは/adminの画面を一度も表示せず、devtoolsのNetworkタブ等で見た
   // リクエストの形を真似て直接POSTするだけでも実行できてしまうため、
@@ -36,7 +36,7 @@ export async function deletePost(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function updatePost(formData: FormData) {
+async function updatePost(formData: FormData) {
   // deletePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
   if (!(await isAdminAuthenticated())) {
     throw new Error("権限がありません。");
@@ -69,7 +69,7 @@ export async function updatePost(formData: FormData) {
   redirect("/admin");
 }
 
-export async function deleteReply(formData: FormData) {
+async function deleteReply(formData: FormData) {
   // deletePost/updatePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
   if (!(await isAdminAuthenticated())) {
     throw new Error("権限がありません。");
@@ -90,3 +90,5 @@ export async function deleteReply(formData: FormData) {
   revalidatePath(`/admin/posts/${postId}/edit`);
   revalidatePath("/");
 }
+
+export { deletePost, updatePost, deleteReply };
