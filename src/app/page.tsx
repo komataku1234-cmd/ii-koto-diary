@@ -169,7 +169,7 @@ export default async function Home({
                       type="text"
                       name="content"
                       required
-                      maxLength={140}
+                      maxLength={30}
                       placeholder="コメントする"
                       className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
                     />
