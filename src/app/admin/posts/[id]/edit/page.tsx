@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { updatePost } from "../../../actions";
+import { updatePost, deleteReply } from "../../../actions";
 
 export default async function EditPostPage({
   params,
@@ -23,6 +23,12 @@ export default async function EditPostPage({
   if (!post) {
     notFound();
   }
+
+  // 管理者はこの投稿に付いているコメントの削除もここで行えるようにする
+  const replies = await prisma.reply.findMany({
+    where: { postId, deletedAt: null },
+    orderBy: { createdAt: "asc" },
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
@@ -68,6 +74,39 @@ export default async function EditPostPage({
           保存する
         </button>
       </form>
+
+      <div className="flex flex-col gap-2">
+        <h3 className="text-sm font-semibold">コメント</h3>
+        {replies.length === 0 ? (
+          <p className="text-sm text-slate-500">コメントはありません。</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {replies.map((reply) => (
+              <li
+                key={reply.id}
+                className="flex items-start justify-between gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm"
+              >
+                <div>
+                  <span className="font-medium text-slate-600">
+                    {reply.nickname || "名無しさん"}
+                  </span>
+                  <span className="ml-2 text-slate-500">{reply.content}</span>
+                </div>
+                <form action={deleteReply} className="shrink-0">
+                  <input type="hidden" name="replyId" value={reply.id} />
+                  <input type="hidden" name="postId" value={post.id} />
+                  <button
+                    type="submit"
+                    className="rounded-md border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  >
+                    削除
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <Link href="/admin" className="text-sm text-slate-500 hover:underline">
         ← 管理者画面に戻る
