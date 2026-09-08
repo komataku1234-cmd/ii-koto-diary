@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { addReaction } from "./actions";
+import { SearchSortForm } from "./SearchSortForm";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -10,12 +11,18 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   timeZone: "Asia/Tokyo", // サーバー(コンテナ)のタイムゾーンがUTCなので、表示だけ日本時間に変換する
 });
 
-export default async function Home({searchParams}: {searchParams: Promise<{ q?: string }>}) {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string }>;
+}) {
   // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
   //分割代入
-  const { q } = await searchParams;
+  const { q, sort } = await searchParams;
   //falsy全部
   const keyword = q?.trim() || undefined;
+  // sortには"new"(新着順)か、リアクション種類のid(文字列)が入る。未指定時は新着順扱い
+  const sortReactionTypeId = sort && sort !== "new" ? Number(sort) : undefined;
 
   // 投稿一覧とリアクション種類マスタは互いに依存しないので並行して取得する
   const [posts, reactionTypes] = await Promise.all([
@@ -45,26 +52,26 @@ export default async function Home({searchParams}: {searchParams: Promise<{ q?: 
     prisma.reactionType.findMany({ orderBy: { id: "asc" } }),
   ]);
 
+  // 特定の絵文字(リアクション種類)が多い順のときだけ、取得済みのpostsをJS側で並び替える。
+  // Prismaのリレーション件数ソート(_count)は「全種類合計」しか数えられず、
+  // 「この絵文字だけの件数」でソートする方法が無いため、JSで数えて並び替えている。
+  if (sortReactionTypeId !== undefined && Number.isInteger(sortReactionTypeId)) {
+    posts.sort((a, b) => {
+      const countA = a.reactions.filter(
+        (r) => r.reactionTypeId === sortReactionTypeId
+      ).length;
+      const countB = b.reactions.filter(
+        (r) => r.reactionTypeId === sortReactionTypeId
+      ).length;
+      return countB - countA;
+    });
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-base font-semibold">タイムライン</h2>
 
-      {/* method="get"のプレーンなformなのでJS無しでも動作し、送信すると/?q=キーワードに遷移する */}
-      <form action="/" method="get" className="flex gap-2">
-        <input
-          type="text"
-          name="q"
-          defaultValue={keyword}
-          placeholder="本文・ニックネームで検索"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          className="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-        >
-          検索
-        </button>
-      </form>
+      <SearchSortForm keyword={keyword} sort={sort} reactionTypes={reactionTypes} />
 
       {posts.length === 0 ? (
         <p className="text-sm text-slate-500">
