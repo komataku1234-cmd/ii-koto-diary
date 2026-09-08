@@ -10,6 +10,8 @@ export function SearchSortForm({
   reactionTypes: { id: number; emoji: string }[];
 }) {
   return (
+    // flex-col(縦並び)がデフォルトで、sm:(画面幅が一定以上になったら)だけflex-row(横並び)に切り替える、
+    // Tailwindのレスポンシブ記法。スマホでは縦積み、PCでは横並びになる
     <form action="/" method="get" className="flex flex-col gap-2 sm:flex-row">
       <input
         type="text"

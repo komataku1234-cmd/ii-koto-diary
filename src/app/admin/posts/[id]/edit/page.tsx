@@ -82,6 +82,8 @@ export default async function EditPostPage({
         ) : (
           <ul className="flex flex-col gap-2">
             {replies.map((reply) => (
+              // items-start → コメント本文が長くて複数行になったとき、右の削除ボタンが
+              // 上下中央(デフォルト)ではなく上端に揃うようにする
               <li
                 key={reply.id}
                 className="flex items-start justify-between gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm"
@@ -92,6 +94,7 @@ export default async function EditPostPage({
                   </span>
                   <span className="ml-2 text-slate-500">{reply.content}</span>
                 </div>
+                {/* shrink-0 → 左のコメント本文がどれだけ長くても、削除ボタン側は潰れて小さくならない */}
                 <form action={deleteReply} className="shrink-0">
                   <input type="hidden" name="replyId" value={reply.id} />
                   <input type="hidden" name="postId" value={post.id} />

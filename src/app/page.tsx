@@ -104,10 +104,14 @@ export default async function Home({
                 key={post.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
               >
+                {/* items-baseline → 文字サイズ(text-sm と text-xs)が違う2つを並べたとき、
+                    中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-sm font-medium">
                     {post.nickname || "名無しさん"}
                   </span>
+                  {/* shrink-0 → flexコンテナの幅が足りないとき、他の要素(ニックネーム側)を優先して縮め、
+                      この日時表示は縮めない(潰れて折り返さないようにする) */}
                   <time
                     className="shrink-0 text-xs text-slate-400"
                     dateTime={post.createdAt.toISOString()} //スクリーンリーダー利用者向けのアクセシビリティ配慮
@@ -157,6 +161,8 @@ export default async function Home({
                   className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3"
                 >
                   <input type="hidden" name="postId" value={post.id} />
+                  {/* self-start → 親(flex flex-col)は子要素を横幅いっぱいに伸ばす(デフォルトのstretch)ので、
+                      それを打ち消して本来の幅(w-32で指定した分)だけにする */}
                   <input
                     type="text"
                     name="nickname"
@@ -165,6 +171,7 @@ export default async function Home({
                     className="w-32 self-start rounded-md border border-slate-300 px-2 py-1 text-xs"
                   />
                   <div className="flex gap-2">
+                    {/* flex-1 → 隣の送信ボタン(shrink-0で幅固定)以外の余ったスペースを、この入力欄が全部埋める */}
                     <input
                       type="text"
                       name="content"

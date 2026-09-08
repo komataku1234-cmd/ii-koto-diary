@@ -47,6 +47,7 @@ export default async function AdminPage() {
           </thead>
           <tbody>
             {posts.map((post) => (
+              // last:border-0 → 一番最後の行だけ下線(border-b)を消す。CSSの:last-childに相当するTailwindの記法
               <tr key={post.id} className="border-b border-slate-100 last:border-0">
                 <td className="px-3 py-2 text-slate-500">{post.id}</td>
                 <td className="px-3 py-2">{post.nickname || "名無しさん"}</td>
@@ -74,6 +75,9 @@ export default async function AdminPage() {
                       >
                         編集
                       </Link>
+                      {/* contents → このform自体は箱(レイアウト上の存在)を持たず、
+                          中のbuttonだけが親のflexに直接並んでいるかのように扱われる。
+                          これが無いと、隣の編集Linkとボタンの大きさが揃わない */}
                       <form action={deletePost} className="contents">
                         <input type="hidden" name="postId" value={post.id} />
                         <button
