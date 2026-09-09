@@ -85,38 +85,26 @@ export default async function Home({
         <p className="text-sm text-slate-500">{emptyMessage}</p>) 
         : (
         <ul className="flex flex-col gap-3">
-          {posts.map((post) => {
-            // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
-            // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
-            // emoji/nameはreactionTypes(マスタ)側から引くので、ここではreactionTypeIdごとの件数だけ持てば十分。
-            //groupBy には include が使えない
+          {posts.map((post) => (
+            // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため(下記参照)、
+            // includeで取得した生のリアクション行を、表示直前にfilter().lengthで種類ごとに数えている。
+            // これはposts.sort()の中のcountA/countBと同じパターン(Mapで先に集計せず、都度数える)。
+            //
             // もしDB側(groupBy)でやるなら、こういう別クエリが必要になる↓
-            
             // const grouped = await prisma.reaction.groupBy({
             //   by: ["postId", "reactionTypeId"],
             //   where: { postId: { in: posts.map((p) => p.id) } },
             //   _count: true,
             // });
-
             // → 結果は投稿とは紐づいていない配列({postId, reactionTypeId, _count})なので、
             // grouped = [{ postId: 7, reactionTypeId: 1, _count: 2 }, { postId: 7, reactionTypeId: 2, _count: 1 }, ...]
-            //   post.idと突き合わせて再マージする処理が別途必要になり複雑になる
-
+            //   post.idと突き合わせて再マージする処理(下記)が別途必要になり複雑になる
             // const countsByPostId = new Map<number, typeof grouped>();
             // for (const g of grouped) {
             //   const list = countsByPostId.get(g.postId) ?? [];
             //   list.push(g);
             //   countsByPostId.set(g.postId, list);
             // }
-            const reactionCounts = new Map<number, number>();
-            for (const reaction of post.reactions) {
-              reactionCounts.set(
-                reaction.reactionTypeId,
-                (reactionCounts.get(reaction.reactionTypeId) ?? 0) + 1
-              );
-            }
-
-            return (
               <li
                 key={post.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
@@ -154,7 +142,11 @@ export default async function Home({
                         className="rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
                       >
                         {reactionType.emoji}{" "}
-                        {reactionCounts.get(reactionType.id) ?? 0}
+                        {
+                          post.reactions.filter(
+                            (r) => r.reactionTypeId === reactionType.id
+                          ).length
+                        }
                       </button>
                     </form>
                   ))}
@@ -206,8 +198,7 @@ export default async function Home({
                   </div>
                 </form>
               </li>
-            );
-          })}
+          ))}
         </ul>
       )}
     </div>
