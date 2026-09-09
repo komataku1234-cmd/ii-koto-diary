@@ -17,9 +17,9 @@ export default async function Home({
   searchParams: Promise<{ q?: string; sort?: string }>;
 }) {
   // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
-  //分割代入
+  //分割代入  q=query
   const { q, sort } = await searchParams;
-  //falsy全部
+  //データあればtrim()して前後の空白を除去、無ければ又は空文字ならundefinedにする
   const keyword = q?.trim() || undefined;
   // sortには"new"(新着順)か、リアクション種類のid(文字列)が入る。未指定時は新着順扱い
   const sortReactionTypeId = sort && sort !== "new" ? Number(sort) : undefined;
@@ -31,6 +31,7 @@ export default async function Home({
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
         // 本文・ニックネームのどちらかに部分一致すればヒットさせる
+        //スプレッドがないと文法エラー。
         ...(keyword? 
             {
               OR: [
@@ -67,10 +68,12 @@ export default async function Home({
       const countB = b.reactions.filter(
         (r) => r.reactionTypeId === sortReactionTypeId
       ).length;
-      // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる
+      // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる　sortにreturn 0を返すと順序は変わらない
       return countB - countA;
     });
   }
+  // 二重の三項演算子を使うと可読性が落ちるので、変数に入れてから表示する
+  const emptyMessage = keyword? `「${keyword}」に一致する投稿は見つかりませんでした。`: "投稿はまだありません。";
 
   return (
     <div className="flex flex-col gap-4">
@@ -79,18 +82,32 @@ export default async function Home({
       <SearchSortForm keyword={keyword} sort={sort} reactionTypes={reactionTypes} />
 
       {posts.length === 0 ? (
-        <p className="text-sm text-slate-500">
-          {keyword
-            ? `「${keyword}」に一致する投稿は見つかりませんでした。`
-            : "投稿はまだありません。"}
-        </p>
-      ) : (
+        <p className="text-sm text-slate-500">{emptyMessage}</p>) 
+        : (
         <ul className="flex flex-col gap-3">
           {posts.map((post) => {
             // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
             // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
             // emoji/nameはreactionTypes(マスタ)側から引くので、ここではreactionTypeIdごとの件数だけ持てば十分。
             //groupBy には include が使えない
+            // もしDB側(groupBy)でやるなら、こういう別クエリが必要になる↓
+            
+            // const grouped = await prisma.reaction.groupBy({
+            //   by: ["postId", "reactionTypeId"],
+            //   where: { postId: { in: posts.map((p) => p.id) } },
+            //   _count: true,
+            // });
+
+            // → 結果は投稿とは紐づいていない配列({postId, reactionTypeId, _count})なので、
+            // grouped = [{ postId: 7, reactionTypeId: 1, _count: 2 }, { postId: 7, reactionTypeId: 2, _count: 1 }, ...]
+            //   post.idと突き合わせて再マージする処理が別途必要になり複雑になる
+
+            // const countsByPostId = new Map<number, typeof grouped>();
+            // for (const g of grouped) {
+            //   const list = countsByPostId.get(g.postId) ?? [];
+            //   list.push(g);
+            //   countsByPostId.set(g.postId, list);
+            // }
             const reactionCounts = new Map<number, number>();
             for (const reaction of post.reactions) {
               reactionCounts.set(
