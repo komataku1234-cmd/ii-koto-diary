@@ -12,10 +12,42 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
+model Post {
   id        Int      @id @default(autoincrement())
-  title     String
-  done      Boolean  @default(false)
+  nickname  String?
+  content   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  reactions Reaction[]
+  replies   Reply[]
+}
+
+model ReactionType {
+  id    Int    @id @default(autoincrement())
+  name  String
+  emoji String
+
+  reactions Reaction[]
+}
+
+model Reaction {
+  id             Int      @id @default(autoincrement())
+  postId         Int
+  post           Post     @relation(fields: [postId], references: [id])
+  reactionTypeId Int
+  reactionType   ReactionType @relation(fields: [reactionTypeId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  nickname  String?
+  content   String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
 }
 
