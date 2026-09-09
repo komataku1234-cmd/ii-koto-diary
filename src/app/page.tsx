@@ -86,48 +86,30 @@ export default async function Home({
         : (
         <ul className="flex flex-col gap-3">
           {posts.map((post) => (
-            // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため(下記参照)、
-            // includeで取得した生のリアクション行を、表示直前にfilter().lengthで種類ごとに数えている。
-            // これはposts.sort()の中のcountA/countBと同じパターン(Mapで先に集計せず、都度数える)。
-            //
-            // もしDB側(groupBy)でやるなら、こういう別クエリが必要になる↓
-            // const grouped = await prisma.reaction.groupBy({
-            //   by: ["postId", "reactionTypeId"],
-            //   where: { postId: { in: posts.map((p) => p.id) } },
-            //   _count: true,
-            // });
-            // → 結果は投稿とは紐づいていない配列({postId, reactionTypeId, _count})なので、
-            // grouped = [{ postId: 7, reactionTypeId: 1, _count: 2 }, { postId: 7, reactionTypeId: 2, _count: 1 }, ...]
-            //   post.idと突き合わせて再マージする処理(下記)が別途必要になり複雑になる
-            // const countsByPostId = new Map<number, typeof grouped>();
-            // for (const g of grouped) {
-            //   const list = countsByPostId.get(g.postId) ?? [];
-            //   list.push(g);
-            //   countsByPostId.set(g.postId, list);
-            // }
               <li
                 key={post.id}
-                className="rounded-lg border border-slate-200 bg-white p-4"
-              >
+                className="rounded-lg border border-slate-200 bg-white p-4"> {/* rounded：角丸 border:枠線*/}
                 {/* items-baseline → 文字サイズ(text-sm と text-xs)が違う2つを並べたとき、
                     中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-sm font-medium">
-                    {post.nickname || "名無しさん"}
+                    {post.nickname || "名無しさん"}{/* ニックネームが無ければ「名無しさん」と表示 */}
                   </span>
                   {/* shrink-0 → flexコンテナの幅が足りないとき、他の要素(ニックネーム側)を優先して縮め、
                       この日時表示は縮めない(潰れて折り返さないようにする) */}
                   <time
                     className="shrink-0 text-xs text-slate-400"
-                    dateTime={post.createdAt.toISOString()} //スクリーンリーダー利用者向けのアクセシビリティ配慮
+                    dateTime={post.createdAt.toISOString()} //スクリーンリーダー(読み上げソフト)利用者向けのアクセシビリティ配慮
                   >
                     {dateFormatter.format(post.createdAt)}
                   </time>
                 </div>
+                {/* whitespace-pre-wrap → 本来HTMLは改行やスペースを詰めて1行にしてしまうが、
+                    投稿フォームで打った改行をそのまま表示しつつ、長い行は折り返してはみ出さないようにする */}
                 <p className="mt-2 whitespace-pre-wrap text-sm">
                   {post.content}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">{/* flex-wrap → 横幅が足りなくなったら折り返す */}
                   {/* 押されていない種類も0件のボタンとして常に表示し、押せるようにする */}
                   {reactionTypes.map((reactionType) => (
                     <form key={reactionType.id} action={addReaction}>
@@ -167,8 +149,7 @@ export default async function Home({
                 )}
                 <form
                   action={createReply}
-                  className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3"
-                >
+                  className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">{/* border-t → 上線 */}
                   <input type="hidden" name="postId" value={post.id} />
                   {/* self-start → 親(flex flex-col)は子要素を横幅いっぱいに伸ばす(デフォルトのstretch)ので、
                       それを打ち消して本来の幅(w-32で指定した分)だけにする */}

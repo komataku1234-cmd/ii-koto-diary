@@ -59,6 +59,7 @@
 - vercelと接続させるdbの選定(NeonとSupabase)
 - vercelはdocker環境じゃないため、gitに送らないクライアントとかをどうするか
 - PreviewとProductionでDBを共有するか分離するか
+- returnの中でreturn(<ul>の中<li>の情報をreturnでまとめて返すみたいな感じ)のコードにするか、見やすさ重視のコードにするか
 
 ### 学習した内容
 - ビルド→nectjsからjsに変換、効率よく読み込めるようになんかする(バンドル)
