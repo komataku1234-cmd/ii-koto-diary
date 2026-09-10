@@ -23,6 +23,7 @@ export async function addReaction(formData: FormData) {
 }
 
 const MAX_REPLY_LENGTH = 30;
+const MAX_NICKNAME_LENGTH = 20;
 
 
 export async function createReply(formData: FormData) {
@@ -42,6 +43,15 @@ export async function createReply(formData: FormData) {
   // 実際に保存する文字列(trim()後)と同じ基準で判定する。
   if (content.trim().length > MAX_REPLY_LENGTH) {
     throw new Error(`コメントは${MAX_REPLY_LENGTH}文字以内で入力してください。`);
+  }
+  if (
+    typeof nickname === "string" &&
+    nickname.trim().length > MAX_NICKNAME_LENGTH
+  ) {
+    // nicknameも同じ理由(devtools等でmaxLength属性を外して回避されうる)でサーバー側でも検証する
+    throw new Error(
+      `ニックネームは${MAX_NICKNAME_LENGTH}文字以内で入力してください。`,
+    );
   }
 
   await prisma.reply.create({

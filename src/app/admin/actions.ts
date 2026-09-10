@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 const MAX_CONTENT_LENGTH = 140;
+const MAX_NICKNAME_LENGTH = 20;
 
 async function deletePost(formData: FormData) {
   // admin/page.tsxのisAdminAuthenticatedチェックは「ページを描画するとき」にしか働かない。
@@ -57,6 +58,15 @@ async function updatePost(formData: FormData) {
   if (content.trim().length > MAX_CONTENT_LENGTH) {
     // post/actions.tsのcreatePostと同じ理由(devtools等での改ざん・直接POST対策)
     throw new Error(`本文は${MAX_CONTENT_LENGTH}文字以内で入力してください。`);
+  }
+  if (
+    typeof nickname === "string" &&
+    nickname.trim().length > MAX_NICKNAME_LENGTH
+  ) {
+    // nicknameも同じ理由(devtools等でmaxLength属性を外して回避されうる)でサーバー側でも検証する
+    throw new Error(
+      `ニックネームは${MAX_NICKNAME_LENGTH}文字以内で入力してください。`,
+    );
   }
 
   await prisma.post.update({
