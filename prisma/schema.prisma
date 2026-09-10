@@ -14,7 +14,7 @@ datasource db {
 
 model Post {
   id        Int      @id @default(autoincrement())
-  nickname  String?
+  nickname  String   @default("名無しさん")
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -45,7 +45,7 @@ model Reply {
   id        Int      @id @default(autoincrement())
   postId    Int
   post      Post     @relation(fields: [postId], references: [id])
-  nickname  String?
+  nickname  String   @default("名無しさん")
   content   String
   createdAt DateTime @default(now())
   deletedAt DateTime?
