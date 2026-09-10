@@ -17,9 +17,9 @@ export default async function Home({
   searchParams: Promise<{ q?: string; sort?: string }>;
 }) {
   // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
-  //分割代入
+  //分割代入  q=query
   const { q, sort } = await searchParams;
-  //falsy全部
+  //データあればtrim()して前後の空白を除去、無ければ又は空文字ならundefinedにする
   const keyword = q?.trim() || undefined;
   // sortには"new"(新着順)か、リアクション種類のid(文字列)が入る。未指定時は新着順扱い
   const sortReactionTypeId = sort && sort !== "new" ? Number(sort) : undefined;
@@ -31,6 +31,7 @@ export default async function Home({
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
         // 本文・ニックネームのどちらかに部分一致すればヒットさせる
+        //スプレッドがないと文法エラー。
         ...(keyword? 
             {
               OR: [
@@ -67,10 +68,12 @@ export default async function Home({
       const countB = b.reactions.filter(
         (r) => r.reactionTypeId === sortReactionTypeId
       ).length;
-      // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる
+      // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる　sortにreturn 0を返すと順序は変わらない
       return countB - countA;
     });
   }
+  // 二重の三項演算子を使うと可読性が落ちるので、変数に入れてから表示する
+  const emptyMessage = keyword? `「${keyword}」に一致する投稿は見つかりませんでした。`: "投稿はまだありません。";
 
   return (
     <div className="flex flex-col gap-4">
@@ -79,50 +82,35 @@ export default async function Home({
       <SearchSortForm keyword={keyword} sort={sort} reactionTypes={reactionTypes} />
 
       {posts.length === 0 ? (
-        <p className="text-sm text-slate-500">
-          {keyword
-            ? `「${keyword}」に一致する投稿は見つかりませんでした。`
-            : "投稿はまだありません。"}
-        </p>
-      ) : (
+        <p className="text-sm text-slate-500">{emptyMessage}</p>) 
+        : (
         <ul className="flex flex-col gap-3">
-          {posts.map((post) => {
-            // DB側でGROUP BYすると別クエリ+postIdでの再マージが必要になり複雑になるため、
-            // includeで取得した生のリアクション行をここでJS側で種類ごとに集計している。
-            // emoji/nameはreactionTypes(マスタ)側から引くので、ここではreactionTypeIdごとの件数だけ持てば十分。
-            //groupBy には include が使えない
-            const reactionCounts = new Map<number, number>();
-            for (const reaction of post.reactions) {
-              reactionCounts.set(
-                reaction.reactionTypeId,
-                (reactionCounts.get(reaction.reactionTypeId) ?? 0) + 1
-              );
-            }
-
-            return (
+          {posts.map((post) => (
               <li
                 key={post.id}
-                className="rounded-lg border border-slate-200 bg-white p-4"
-              >
+                className="rounded-lg border border-slate-200 bg-white p-4"> {/* rounded：角丸 border:枠線*/}
                 {/* items-baseline → 文字サイズ(text-sm と text-xs)が違う2つを並べたとき、
                     中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-sm font-medium">
-                    {post.nickname || "名無しさん"}
+                    {/* nicknameは未入力でもDBの@defaultで必ず文字列が入っているため穴埋め不要 */}
+                    {post.nickname}
                   </span>
                   {/* shrink-0 → flexコンテナの幅が足りないとき、他の要素(ニックネーム側)を優先して縮め、
                       この日時表示は縮めない(潰れて折り返さないようにする) */}
                   <time
                     className="shrink-0 text-xs text-slate-400"
-                    dateTime={post.createdAt.toISOString()} //スクリーンリーダー利用者向けのアクセシビリティ配慮
+                    dateTime={post.createdAt.toISOString()} //スクリーンリーダー(読み上げソフト)利用者向けのアクセシビリティ配慮
                   >
                     {dateFormatter.format(post.createdAt)}
                   </time>
                 </div>
+                {/* whitespace-pre-wrap → 本来HTMLは改行やスペースを詰めて1行にしてしまうが、
+                    投稿フォームで打った改行をそのまま表示しつつ、長い行は折り返してはみ出さないようにする */}
                 <p className="mt-2 whitespace-pre-wrap text-sm">
                   {post.content}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">{/* flex-wrap → 横幅が足りなくなったら折り返す */}
                   {/* 押されていない種類も0件のボタンとして常に表示し、押せるようにする */}
                   {reactionTypes.map((reactionType) => (
                     <form key={reactionType.id} action={addReaction}>
@@ -137,7 +125,11 @@ export default async function Home({
                         className="rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
                       >
                         {reactionType.emoji}{" "}
-                        {reactionCounts.get(reactionType.id) ?? 0}
+                        {
+                          post.reactions.filter(
+                            (r) => r.reactionTypeId === reactionType.id
+                          ).length
+                        }
                       </button>
                     </form>
                   ))}
@@ -147,7 +139,7 @@ export default async function Home({
                     {post.replies.map((reply) => (
                       <li key={reply.id} className="text-xs">
                         <span className="font-medium text-slate-600">
-                          {reply.nickname || "名無しさん"}
+                          {reply.nickname}
                         </span>
                         <span className="ml-2 text-slate-500">
                           {reply.content}
@@ -158,8 +150,7 @@ export default async function Home({
                 )}
                 <form
                   action={createReply}
-                  className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3"
-                >
+                  className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">{/* border-t → 上線 */}
                   <input type="hidden" name="postId" value={post.id} />
                   {/* self-start → 親(flex flex-col)は子要素を横幅いっぱいに伸ばす(デフォルトのstretch)ので、
                       それを打ち消して本来の幅(w-32で指定した分)だけにする */}
@@ -189,8 +180,7 @@ export default async function Home({
                   </div>
                 </form>
               </li>
-            );
-          })}
+          ))}
         </ul>
       )}
     </div>

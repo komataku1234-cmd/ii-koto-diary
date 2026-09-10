@@ -46,7 +46,7 @@ export default async function EditPostPage({
             name="nickname"
             type="text"
             maxLength={20}
-            defaultValue={post.nickname ?? ""}
+            defaultValue={post.nickname}
             placeholder="名無しさん"
             className="rounded-md border border-slate-300 px-3 py-2 text-sm"
           />
@@ -90,7 +90,7 @@ export default async function EditPostPage({
               >
                 <div>
                   <span className="font-medium text-slate-600">
-                    {reply.nickname || "名無しさん"}
+                    {reply.nickname}
                   </span>
                   <span className="ml-2 text-slate-500">{reply.content}</span>
                 </div>

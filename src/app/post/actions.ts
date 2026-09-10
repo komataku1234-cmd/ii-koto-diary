@@ -32,12 +32,11 @@ export async function createPost(formData: FormData) {
   await prisma.post.create({
     data: {
       content: content.trim(),
-      // 未入力(空文字やスペースのみ)ならnullにして、
-      // 表示側の `post.nickname || "名無しさん"` に任せる。
-      nickname:
-        typeof nickname === "string" && nickname.trim() !== ""
-          ? nickname.trim()
-          : null,
+      // 未入力(空文字やスペースのみ)ならキー自体を省略し、
+      // DB側の@default("名無しさん")を適用させる(新規作成のみ有効な仕組み)。
+      ...(typeof nickname === "string" && nickname.trim() !== ""
+        ? { nickname: nickname.trim() }
+        : {}),
     },
   });
 

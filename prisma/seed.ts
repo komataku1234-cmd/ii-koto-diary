@@ -37,14 +37,14 @@ async function main() {
 
   await prisma.post.create({
     data: {
-      nickname: null,
+      // nicknameキーを省略 → DBの@default("名無しさん")が適用される
       content: "コンビニのレジで店員さんが「今日も一日お疲れ様です」って言ってくれた。",
       reactions: {
         create: [{ reactionTypeId: wakaru.id }],
       },
       replies: {
         create: [
-          { nickname: null, content: "わかります、それだけで元気出ますよね。" },
+          { content: "わかります、それだけで元気出ますよね。" }, // こちらもnickname省略
           { nickname: "うさぎ", content: "私も同じことありました!" },
         ],
       },

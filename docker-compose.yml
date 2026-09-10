@@ -16,9 +16,12 @@ services:
     image: postgres:18
     container_name: ii-koto-diary-db
     environment:
-      POSTGRES_USER: postgres       # 初回起動時に作られるユーザー
-      POSTGRES_PASSWORD: postgres   # そのパスワード(ローカル開発専用)
-      POSTGRES_DB: ii_koto_diary    # 初回起動時に作られるデータベース名
+      # ${...}は.envファイル(プロジェクト直下、git管理外)から自動で読み込まれる。
+      # docker-compose.ymlはgitにコミットされるため、直書きせずここに変数として渡すことで
+      # 実際の値がリポジトリに残らないようにしている
+      POSTGRES_USER: ${POSTGRES_USER}       # 初回起動時に作られるユーザー
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}   # そのパスワード(ローカル開発専用)
+      POSTGRES_DB: ${POSTGRES_DB}    # 初回起動時に作られるデータベース名
     volumes:
       - db_data:/var/lib/postgresql  # データを永続化(18+ は /data を付けない)
 

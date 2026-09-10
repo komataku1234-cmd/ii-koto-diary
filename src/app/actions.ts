@@ -24,6 +24,7 @@ export async function addReaction(formData: FormData) {
 
 const MAX_REPLY_LENGTH = 30;
 
+
 export async function createReply(formData: FormData) {
   const postId = Number(formData.get("postId"));
   const nickname = formData.get("nickname");
@@ -43,10 +44,10 @@ export async function createReply(formData: FormData) {
     data: {
       postId,
       content: content.trim(),
-      nickname:
-        typeof nickname === "string" && nickname.trim() !== ""
-          ? nickname.trim()
-          : null,
+      // 未入力ならキー自体を省略し、DB側の@default("名無しさん")を適用させる
+      ...(typeof nickname === "string" && nickname.trim() !== ""
+        ? { nickname: nickname.trim() }
+        : {}),
     },
   });
 

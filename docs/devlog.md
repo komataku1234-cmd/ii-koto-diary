@@ -7,7 +7,6 @@
 
 ## 次にやること(TODO)
 - いいねをCookieを使って1回だけにする(二重押し防止)
-- Vercelを使えるようにする(デプロイ)
 
 ---
 
@@ -53,9 +52,14 @@
 ### 調査した内容
 - vercelについて
 - NeonとNeonとSupabaseについて
+- vercelを使うにあたってのコードの変更（環境構築）
 
 ### 悩み・疑問
--　vercelと接続させるdbの選定(NeonとSupabase)
+- vercelと接続させるdbの選定(NeonとSupabase)
+- vercelはdocker環境じゃないため、gitに送らないクライアントとかをどうするか
+- PreviewとProductionでDBを共有するか分離するか
+- returnの中でreturn(<ul>の中<li>の情報をreturnでまとめて返すみたいな感じ)のコードにするか、見やすさ重視のコードにするか
+- 名前を入れなかった人をJSXで名無しと表示しているが検索で名無しを調べられないから許容かどうか
 
 ### 学習した内容
 - ビルド→nectjsからjsに変換、効率よく読み込めるようになんかする(バンドル)
@@ -63,15 +67,22 @@
 - envの情報をgithubは持っていないため、その情報をvercelに渡す作業が必要
 - NeonはprosgresSQLのdbサービスで簡易的な操作が可能。gitのような動きができる(コミットやブランチみたいな)
 - SupabaseはprosgresSQL専用ではなく総合dbサービス。メリットはユーザー認証の雛形があるや画像や動画を保存できる
+- 元々PreviewとProductionでDBを共有するつもりだったが、Neonの機能でPreviewだけ自動的に専用DBブランチを持たせることができたのでそれを採用
 
 ### 設計
 - 本番用DBはローカル(Docker)とは別に、Neonを用意する
 - Vercelのdevelopブランチ→Preview環境、mainブランチ→Production環境、という対応にして今の運用と揃える
 - まずはGit連携を試すだけにして、確認後は連携を切る(デプロイ回数を抑えるため)
+- ReactionTypeマスタデータはNeonのSQL Editorから手動で投入する運用にした
+INSERT INTO "ReactionType" (name, emoji) VALUES
+  ('いいね', '👍'),
+  ('わかる', '🙌'),
+  ('ほっこり', '🥰');
 
 ### 仕様
 - 個人開発規模なのでVercel Hobby(無料・非商用利用)の範囲で運用する
 - 環境変数(DATABASE_URL・ADMIN_PASSWORD)はVercel側にも別途設定する必要がある
+- mainブランチ=Production、developブランチ=Preview(専用DBブランチ)という対応
 
 ## テンプレート(コピーして使う)
 
