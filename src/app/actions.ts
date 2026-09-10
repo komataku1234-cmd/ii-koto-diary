@@ -36,7 +36,11 @@ export async function createReply(formData: FormData) {
   if (typeof content !== "string" || content.trim().length === 0) {
     throw new Error("コメントを入力してください。");
   }
-  if (content.length > MAX_REPLY_LENGTH) {
+  // trim()前の長さで判定すると、IMEの変換確定時などに紛れ込む
+  // 末尾の改行・空白まで文字数に数えてしまい、
+  // 見た目は上限内なのにエラーになる不整合が起きるため、
+  // 実際に保存する文字列(trim()後)と同じ基準で判定する。
+  if (content.trim().length > MAX_REPLY_LENGTH) {
     throw new Error(`コメントは${MAX_REPLY_LENGTH}文字以内で入力してください。`);
   }
 
