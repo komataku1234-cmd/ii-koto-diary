@@ -26,8 +26,8 @@ model Post {
 
 model ReactionType {
   id    Int    @id @default(autoincrement())
-  name  String
-  emoji String
+  name  String @unique
+  emoji String @unique
 
   reactions Reaction[]
 }
