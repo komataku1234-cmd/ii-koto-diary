@@ -46,17 +46,14 @@ pnpm dev
 
 ## 環境変数
 
-`.env` に以下を設定してください（ローカル開発用の値の例）。
+`.env.example` をコピーして `.env` を作成してください。
 
-```
-DATABASE_URL="postgresql://postgres:postgres@ii-koto-diary-db:5432/ii_koto_diary"
-ADMIN_PASSWORD="任意の管理者用パスワード"
-
-# docker-compose.yml(dbサービス)が読み込む値。DATABASE_URLの接続情報と一致させること
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=ii_koto_diary
+```bash
+cp .env.example .env
 ```
 
-`ADMIN_PASSWORD` は管理者画面(`/admin`)のログインに使う固定パスワードです。
-`POSTGRES_*` はDocker ComposeがPostgreSQLコンテナを初期化する際に使う値で、これが無いとDBコンテナが起動できません。
+| 変数名 | 説明 |
+|---|---|
+| `DATABASE_URL` | アプリ(Prisma)が接続するDB。ローカルDocker用ならそのままでOK |
+| `ADMIN_PASSWORD` | 管理者画面(`/admin`)のログインに使う固定パスワード。好きな値に変更してください |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Docker ComposeがPostgreSQLコンテナ初期化時に使う値。`DATABASE_URL`の接続情報と一致させること。これが無いとDBコンテナが起動できません |
