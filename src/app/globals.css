@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* デフォルトの背景色と文字色を設定する。Tailwindの@applyで、ユーティリティクラス(text-slate-900とかのこと)をまとめて適用できる */
 body {
   @apply bg-slate-50 text-slate-900;
 }

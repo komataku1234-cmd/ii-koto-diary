@@ -13,6 +13,7 @@ export function SearchSortForm({
     // flex-col(縦並び)がデフォルトで、sm:(画面幅が一定以上になったら)だけflex-row(横並び)に切り替える、
     // Tailwindのレスポンシブ記法。スマホでは縦積み、PCでは横並びになる
     <form action="/" method="get" className="flex flex-col gap-2 sm:flex-row">
+      {/* flex-1 → 隣の送信ボタン(幅固定)以外の余ったスペースを、このinputが埋めて伸びる */}
       <input
         type="text"
         name="q"
@@ -36,6 +37,7 @@ export function SearchSortForm({
           </option>
         ))}
       </select>
+      {/* shrink-0 → 隣のinput(伸びる)に押し潰されないように、幅固定で縮まないようにする */}
       <button
         type="submit"
         className="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
