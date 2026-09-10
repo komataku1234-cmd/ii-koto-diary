@@ -51,6 +51,12 @@ pnpm dev
 ```
 DATABASE_URL="postgresql://postgres:postgres@ii-koto-diary-db:5432/ii_koto_diary"
 ADMIN_PASSWORD="任意の管理者用パスワード"
+
+# docker-compose.yml(dbサービス)が読み込む値。DATABASE_URLの接続情報と一致させること
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=ii_koto_diary
 ```
 
 `ADMIN_PASSWORD` は管理者画面(`/admin`)のログインに使う固定パスワードです。
+`POSTGRES_*` はDocker ComposeがPostgreSQLコンテナを初期化する際に使う値で、これが無いとDBコンテナが起動できません。
