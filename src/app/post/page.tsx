@@ -26,6 +26,7 @@ export default function PostPage() {
         </div>
 
         <div className="flex flex-col gap-1">
+          {/* htmlFor:textareaのidと紐付けることで、ラベルをクリックしたらtextareaにフォーカスが移動するようになる */}
           <label htmlFor="content" className="text-sm font-medium">
             今日あったちょっといいこと
           </label>
