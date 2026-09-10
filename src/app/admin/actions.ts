@@ -57,10 +57,12 @@ async function updatePost(formData: FormData) {
     where: { id: postId },
     data: {
       content: content.trim(),
+      // UPDATEには@defaultが効かない(新規作成時のみ有効)ため、
+      // 空欄ならキーを省略するのではなく明示的に既定値と同じ文字列を書く
       nickname:
         typeof nickname === "string" && nickname.trim() !== ""
           ? nickname.trim()
-          : null,
+          : "名無しさん",
     },
   });
 
