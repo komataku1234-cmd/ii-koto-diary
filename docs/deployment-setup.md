@@ -9,18 +9,21 @@ Vercelはpushを検知すると、`package.json`の`scripts.build`に書かれ�
 ### 採用した内容
 
 ```json
-"build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; fi && prisma generate && next build"
+"build": "prisma migrate deploy && prisma generate && next build"
 ```
 
+- `prisma migrate deploy` → **Preview/Production問わず、毎回**マイグレーションを実行する
 - `prisma generate` → `src/generated/prisma`(Prismaが生成するクライアントのコード)は`.gitignore`対象でリポジトリにpushされないため、ビルドのたびに生成し直す必要がある。無いと`next build`が失敗する
-- `if [ "$VERCEL_ENV" = "production" ]; then prisma migrate deploy; fi` → Vercelが自動でセットする`VERCEL_ENV`(`production`/`preview`/`development`)を見て、**本番ビルドのときだけ**マイグレーションを実行する
 
-> **進捗メモ**: `package.json`に適用済み(`prisma generate`部分・`VERCEL_ENV`分岐部分とも反映済み)。
+> **進捗メモ**: `package.json`に適用済み。
 
-### この形にした理由
+### この形にした理由(変更履歴)
 
-- `develop`ブランチへのpush(Previewビルド)のたびに無条件でマイグレーションすると、まだ本番に出す準備ができていないスキーマ変更が先に適用されてしまう危険がある
-- マイグレーションを手元のPCから`vercel env pull`して実行する方法も検討したが、本番の接続情報がローカルにコピーされる・`.env.local`の消し忘れでローカル開発が誤って本番DBに繋がる事故のリスクがあるため不採用。Vercelのビルド環境内だけで完結する今の方式の方が安全
+当初は`VERCEL_ENV === "production"`のときだけマイグレーションを実行する条件分岐にしていた。理由は、その時点では**PreviewとProductionが同じDBを共有する想定**だったため、`develop`へのpush(Previewビルド)のたびに無条件でマイグレーションすると、まだ本番に出す準備ができていないスキーマ変更が先に本番DBへ適用されてしまう危険があったから。
+
+その後、下記「2. データベース構成」の通り**Neonの機能でPreviewごとに専用のDBブランチを持たせる設定にした**ため、PreviewとProductionのDBは完全に分離された。Previewビルドでマイグレーションを実行しても、それはPreview専用のDBブランチにしか影響せず、本番DBには一切触れない。この前提が変わったことで、条件分岐は不要になり、常に`migrate deploy`を実行する形にシンプル化した。
+
+なお、マイグレーションを手元のPCから`vercel env pull`して実行する方法も検討したが、本番の接続情報がローカルにコピーされる・`.env.local`の消し忘れでローカル開発が誤って本番DBに繋がる事故のリスクがあるため不採用。Vercelのビルド環境内だけで完結する今の方式の方が安全、という判断は変わらず維持している。
 
 ## 2. データベース構成(Neon + Vercel連携)
 
