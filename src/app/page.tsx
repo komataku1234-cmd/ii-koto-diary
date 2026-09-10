@@ -93,7 +93,8 @@ export default async function Home({
                     中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-sm font-medium">
-                    {post.nickname || "名無しさん"}{/* ニックネームが無ければ「名無しさん」と表示 */}
+                    {/* nicknameは未入力でもDBの@defaultで必ず文字列が入っているため穴埋め不要 */}
+                    {post.nickname}
                   </span>
                   {/* shrink-0 → flexコンテナの幅が足りないとき、他の要素(ニックネーム側)を優先して縮め、
                       この日時表示は縮めない(潰れて折り返さないようにする) */}
@@ -138,7 +139,7 @@ export default async function Home({
                     {post.replies.map((reply) => (
                       <li key={reply.id} className="text-xs">
                         <span className="font-medium text-slate-600">
-                          {reply.nickname || "名無しさん"}
+                          {reply.nickname}
                         </span>
                         <span className="ml-2 text-slate-500">
                           {reply.content}
