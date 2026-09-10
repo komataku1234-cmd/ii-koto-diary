@@ -26,13 +26,14 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* justify-between:両端に子要素を寄せて、余った隙間を要素の間だけに均等配置 */}
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">管理者画面 - 投稿一覧</h2>
         <Link href="/" className="text-sm text-slate-500 hover:underline">
           ← タイムラインに戻る
         </Link>
       </div>
-
+      {/* overflow-x-auto:横方向のはみ出しをスクロールバーで対応 */}
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
@@ -52,6 +53,7 @@ export default async function AdminPage() {
                 <td className="px-3 py-2 text-slate-500">{post.id}</td>
                 <td className="px-3 py-2">{post.nickname}</td>
                 <td className="px-3 py-2">{post.content}</td>
+                {/* whitespace-nowrap:改行せずに1行で表示する。*/}
                 <td className="px-3 py-2 whitespace-nowrap text-slate-500">
                   {dateFormatter.format(post.createdAt)}
                 </td>

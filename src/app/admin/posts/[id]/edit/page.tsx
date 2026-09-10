@@ -83,7 +83,7 @@ export default async function EditPostPage({
           <ul className="flex flex-col gap-2">
             {replies.map((reply) => (
               // items-start → コメント本文が長くて複数行になったとき、右の削除ボタンが
-              // 上下中央(デフォルト)ではなく上端に揃うようにする
+              // 上下中央(デフォルト)ではなく上端に揃うようにする。画面上は変わんないけどformとボタンの高さを揃えてる。
               <li
                 key={reply.id}
                 className="flex items-start justify-between gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm"
