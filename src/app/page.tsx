@@ -175,9 +175,11 @@ export default async function Home({
                       placeholder="コメントする"
                       className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
                     />
+                    {/* cursor-pointer → buttonはaタグと違いデフォルトではポインターにならない(cursor:default)ため、
+                        明示的に指定する。hover:bg-slate-700 → ホバー時に色を変えて押せることを分かりやすくする */}
                     <button
                       type="submit"
-                      className="shrink-0 rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white"
+                      className="shrink-0 cursor-pointer rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-700"
                     >
                       送信
                     </button>
