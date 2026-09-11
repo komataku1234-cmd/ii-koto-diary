@@ -125,11 +125,13 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 - UIチェック
 - claude code コマンド調べ
 - 要件定義やER図、物理設計の手直し
+- promiseとpassive: trueの概念
 
 ### 悩み・疑問
 - 管理者投稿一覧画面で本文を多く折り返して表示しているから見づらい
 - いいねを一回だけにするか(Cookieだから厳密ではない)
 - フッターとヘッターを常に表示する形にするか
+- promiseとpassive: trueこれもうちょい勉強
 
 ### 学習した内容
 - 折り返す代わりに...を使う方法(truncate)
