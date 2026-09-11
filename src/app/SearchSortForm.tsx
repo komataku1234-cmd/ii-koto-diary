@@ -28,7 +28,8 @@ export function SearchSortForm({
         // form.submit()と違い、requestSubmit()は実際にボタンを押したのと同じ扱いになる
         // (HTML標準のバリデーションも効くし、送信ボタンのイベントも正しく発火する)。
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+        // selectもbuttonと同じくデフォルトではcursor:defaultのままポインターに変わらないため明示的に指定する
+        className="cursor-pointer rounded-md border border-slate-300 px-3 py-2 text-sm"
       >
         <option value="new">新着順</option>
         {reactionTypes.map((reactionType) => (
