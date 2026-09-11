@@ -51,7 +51,7 @@ export default async function AdminPage() {
               // last:border-0 → 一番最後の行だけ下線(border-b)を消す。CSSの:last-childに相当するTailwindの記法
               <tr key={post.id} className="border-b border-slate-100 last:border-0">
                 <td className="px-3 py-2 text-slate-500">{post.id}</td>
-                <td className="px-3 py-2">{post.nickname}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{post.nickname}</td>
                 <td className="px-3 py-2">{post.content}</td>
                 {/* whitespace-nowrap:改行せずに1行で表示する。*/}
                 <td className="px-3 py-2 whitespace-nowrap text-slate-500">
