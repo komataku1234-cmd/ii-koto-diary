@@ -92,7 +92,11 @@ export default async function Home({
                 {/* items-baseline → 文字サイズ(text-sm と text-xs)が違う2つを並べたとき、
                     中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-medium">
+                  {/* truncate → whitespace-nowrap(1行固定)+overflow-hidden+text-overflow-ellipsisをまとめて指定。
+                      横スクロールの受け皿が無いページなので、はみ出さずに"..."で省略させる。
+                      min-w-0 → flexの子要素はデフォルトで「中身の幅より縮めない」性質があり、
+                      これが無いとtruncateが効かずニックネームが縮まないままはみ出してしまう */}
+                  <span className="min-w-0 truncate text-sm font-medium">
                     {/* nicknameは未入力でもDBの@defaultで必ず文字列が入っているため穴埋め不要 */}
                     {post.nickname}
                   </span>
