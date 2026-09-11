@@ -39,10 +39,10 @@ export function SearchSortForm({
       </select>
       {/* shrink-0 → 隣のinput(伸びる)に押し潰されないように、幅固定で縮まないようにする。
           cursor-pointer → buttonはaタグと違いデフォルトではポインターにならない(cursor:default)ため、
-          明示的に指定する。hover:bg-slate-700 → ホバー時に色を変えて押せることを分かりやすくする */}
+          明示的に指定する */}
       <button
         type="submit"
-        className="shrink-0 cursor-pointer rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        className="shrink-0 cursor-pointer rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
       >
         検索
       </button>
