@@ -1,4 +1,5 @@
 "use client"; // error.tsxと同じくError Boundaryなので必須
+// Error Boundary:子コンポーネントの描画中にエラーが起きたら、代わりにこのUIを表示する
 
 import "./globals.css"; // global-errorはルートレイアウトごと差し替わるため、スタイルも自前で読み込む必要がある
 
@@ -14,6 +15,7 @@ export default function GlobalError({
 }) {
   return (
     <html lang="ja">
+      {/* min-h-screen:画面の高さ分は最低確保 */}
       <body className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-900">
         <div
           role="alert"
