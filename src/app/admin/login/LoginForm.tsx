@@ -27,10 +27,12 @@ export function LoginForm() {
         </p>
       )}
 
+      {/* cursor-pointer → buttonはaタグと違いデフォルトではポインターにならない(cursor:default)ため、明示的に指定する。
+          disabled:cursor-not-allowed → pending中(disabled)はクリックできないことが分かるよう、あえてポインターに戻す */}
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="cursor-pointer rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "確認中..." : "ログイン"}
       </button>
