@@ -35,15 +35,19 @@ export default async function AdminPage() {
       </div>
       {/* overflow-x-auto:横方向のはみ出しをスクロールバーで対応 */}
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
+        {/* table-fixed → table-layout:fixedにする。デフォルト(auto)は中身の最大幅を基準に
+            列幅を決めるため、truncateを付けても表全体がはみ出してスクロールバーが出てしまう。
+            fixedならこのthに書いた幅(w-*)で列幅が固定され、本文列だけ幅指定を省略して
+            残りの余白を全部本文に回している */}
+        <table className="w-full table-fixed text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
             <tr>
-              <th className="px-3 py-2">ID</th>
-              <th className="whitespace-nowrap px-3 py-2">ニックネーム</th>
+              <th className="w-10 px-3 py-2">ID</th>
+              <th className="w-24 whitespace-nowrap px-3 py-2">ニックネーム</th>
               <th className="px-3 py-2">本文</th>
-              <th className="px-3 py-2">投稿日時</th>
-              <th className="px-3 py-2">状態</th>
-              <th className="px-3 py-2"></th>
+              <th className="w-28 px-3 py-2">投稿日時</th>
+              <th className="w-20 px-3 py-2">状態</th>
+              <th className="w-28 px-3 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -52,9 +56,9 @@ export default async function AdminPage() {
               <tr key={post.id} className="border-b border-slate-100 last:border-0">
                 <td className="px-3 py-2 text-slate-500">{post.id}</td>
                 <td className="px-3 py-2">{post.nickname}</td>
-                {/* max-w-xs → truncateは幅の上限が無いと縮めるべき基準が無く効かないため、上限を決める。
-                    全文は編集画面で見られるので、一覧では概要だけ見えれば十分という設計 */}
-                <td className="max-w-xs truncate px-3 py-2">{post.content}</td>
+                {/* table-fixedにしたことでこの列の幅は「他の列の残り全部」になっているので、
+                    max-w-xsは不要。truncateだけでその幅からはみ出た分を...で省略できる */}
+                <td className="truncate px-3 py-2">{post.content}</td>
                 {/* whitespace-nowrap:改行せずに1行で表示する。*/}
                 <td className="px-3 py-2 whitespace-nowrap text-slate-500">
                   {dateFormatter.format(post.createdAt)}
