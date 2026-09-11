@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { deletePost } from "./actions";
+import { deletePost, restorePost } from "./actions";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -77,7 +77,19 @@ export default async function AdminPage() {
                   )}
                 </td>
                 <td className="px-3 py-2">
-                  {!post.deletedAt && (
+                  {post.deletedAt ? (
+                    // 物理削除ではなくソフトデリートなので、誤って削除しても
+                    // deletedAtをnullに戻すだけで元通りに復元できる
+                    <form action={restorePost}>
+                      <input type="hidden" name="postId" value={post.id} />
+                      <button
+                        type="submit"
+                        className="cursor-pointer rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                      >
+                        復元
+                      </button>
+                    </form>
+                  ) : (
                     <div className="flex gap-2">
                       <Link
                         href={`/admin/posts/${post.id}/edit`}

@@ -87,6 +87,28 @@ async function updatePost(formData: FormData) {
   redirect("/admin");
 }
 
+async function restorePost(formData: FormData) {
+  // deletePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
+  if (!(await isAdminAuthenticated())) {
+    throw new Error("権限がありません。");
+  }
+
+  const postId = Number(formData.get("postId"));
+  if (!Number.isInteger(postId)) {
+    throw new Error("不正なリクエストです。");
+  }
+
+  // deletedAtをnullに戻すだけ。物理削除していない(ソフトデリート)ので、
+  // 誤って削除しても元通りに復元できる
+  await prisma.post.update({
+    where: { id: postId },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
 async function deleteReply(formData: FormData) {
   // deletePost/updatePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
   if (!(await isAdminAuthenticated())) {
@@ -109,4 +131,4 @@ async function deleteReply(formData: FormData) {
   revalidatePath("/");
 }
 
-export { deletePost, updatePost, deleteReply };
+export { deletePost, updatePost, deleteReply, restorePost };
