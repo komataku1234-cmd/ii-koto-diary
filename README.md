@@ -27,6 +27,20 @@
 
 詳しい要件は [requirements.md](./requirements.md) を参照してください。
 
+## スクリーンショット
+
+| タイムライン | 投稿 |
+|---|---|
+| ![タイムライン画面](./docs/image/main.png) | ![投稿画面](./docs/image/post.png) |
+
+| 管理者ログイン | 管理者画面（投稿一覧） |
+|---|---|
+| ![管理者ログイン画面](./docs/image/login.png) | ![管理者画面](./docs/image/admin.png) |
+
+| 投稿編集画面 |
+|---|
+| ![投稿編集画面](./docs/image/update.png) |
+
 ## 技術スタック
 
 - Next.js 16 (App Router, Turbopack)
