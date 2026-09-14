@@ -131,4 +131,26 @@ async function deleteReply(formData: FormData) {
   revalidatePath("/");
 }
 
-export { deletePost, updatePost, deleteReply, restorePost };
+async function restoreReply(formData: FormData) {
+  // deletePost/updatePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
+  if (!(await isAdminAuthenticated())) {
+    throw new Error("権限がありません。");
+  }
+
+  const replyId = Number(formData.get("replyId"));
+  const postId = Number(formData.get("postId"));
+  if (!Number.isInteger(replyId) || !Number.isInteger(postId)) {
+    throw new Error("不正なリクエストです。");
+  }
+
+  // restorePostと同じ理由(deletedAtをnullに戻すだけで、ソフトデリートなので元通りに復元できる)
+  await prisma.reply.update({
+    where: { id: replyId },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath(`/admin/posts/${postId}/edit`);
+  revalidatePath("/");
+}
+
+export { deletePost, updatePost, deleteReply, restorePost, restoreReply };
