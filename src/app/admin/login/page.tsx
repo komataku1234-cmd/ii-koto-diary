@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LoginForm } from "./LoginForm";
 
 export default function AdminLoginPage() {
@@ -5,6 +6,10 @@ export default function AdminLoginPage() {
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
       <h2 className="text-base font-semibold">管理者ログイン</h2>
       <LoginForm />
+
+      <Link href="/" className="text-sm text-slate-500 hover:underline">
+        ← タイムラインに戻る
+      </Link>
     </div>
   );
 }
