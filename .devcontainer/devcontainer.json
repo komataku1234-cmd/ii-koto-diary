@@ -6,7 +6,7 @@
   "shutdownAction": "stopCompose",      //vscodeを閉じた時、コンテナを閉じた時にコンテナを停止する
   "forwardPorts": [3001, 5555],      //vscodeの独自機能、だからなくても一応動く vscodeのブラウザで開くときに使うポート番号
   "postCreateCommand": "pnpm install",          //コンテナが初めて作られた、その直後に実行されるコマンド　ボリュームが生成されてから実行させたいためDockerfileではなくこちらに書く
-  "customizations": {          //エディタの設定
+  "customizations": {          //エディタの設定(vscode以外もエディタの設定ができる)
     "vscode": {          //vscodeの拡張機能をコンテナ内に入れるための設定
       "extensions": [       //拡張機能をコンテナ内に入れるための設定
         "dbaeumer.vscode-eslint",      //ESLintをエディタに統合し、保存前にリアルタイムで指摘してくれる

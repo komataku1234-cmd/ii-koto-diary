@@ -63,7 +63,8 @@ Dockerfileの`--activate`で設定した初期値より**そちらを優先**す
 - `build` → `prisma migrate deploy && prisma generate && next build`
   (DBマイグレーション適用→Prismaクライアント生成→Next.jsの本番ビルド、の順)
 - `start` → `next start`(ビルド済みのものを本番モードで起動。) vercelは独自でやるため使ってない     
-- `lint` → `eslint`(コードチェック)
+- `lint` → `eslint`(コードチェック)　pnpm lint →ファイル全体 pnpm exec eslint src/app/error.tsx →特定のファイル
+eslint.config.mjsでどのくらい厳しくチェックするとか決めてる
 
 ## `dependencies` と `devDependencies` の違い
 

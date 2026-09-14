@@ -157,7 +157,7 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 ### 調査した内容
 - フッターとヘッターをどのように使うか
 - 自分の投稿を消せるかどうか
-- 環境構築理解(Dockerfile,docker-compose,deccontainer)
+- 環境構築理解(Dockerfile,docker-compose,deccontainer,pakage.json)
 - claude codeのコマンドでcode reviewを行った
 
 ### 悩み・疑問
@@ -173,6 +173,7 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 別ブラウザで立ち上げると自分の投稿だと判断できないためどちらも不採用。
 - code reviewをかなりの精度でしてくれるからしておこう
 - それぞれのコマンドについて理解することができた
+- pnpmのインストールについてバージョンを今回固定していなかったので、packageManagerで固定した。(pnpm-lockがあるからほぼほぼリスクないけど一応)
 
 ### 設計
 - フッターに画面の一番上に移動できるボタンを作成
