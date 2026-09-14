@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createPost } from "./actions";
+import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 export default function PostPage() {
   return (
@@ -19,7 +20,7 @@ export default function PostPage() {
             id="nickname"
             name="nickname"
             type="text"
-            maxLength={20}
+            maxLength={MAX_NICKNAME_LENGTH}
             placeholder="名無しさん"
             className="rounded-md border border-slate-300 px-3 py-2 text-sm"
           />
@@ -36,7 +37,7 @@ export default function PostPage() {
             id="content"
             name="content"
             required
-            maxLength={140}
+            maxLength={MAX_CONTENT_LENGTH}
             rows={4}
             className="rounded-md border border-slate-300 px-3 py-2 text-sm"
           />

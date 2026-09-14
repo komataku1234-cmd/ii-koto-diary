@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { MAX_REPLY_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 export async function addReaction(formData: FormData) {
   const postId = Number(formData.get("postId"));
@@ -21,10 +22,6 @@ export async function addReaction(formData: FormData) {
   // 最新のリアクション件数が表示されるようキャッシュだけ更新する
   revalidatePath("/");
 }
-
-const MAX_REPLY_LENGTH = 30;
-const MAX_NICKNAME_LENGTH = 20;
-
 
 export async function createReply(formData: FormData) {
   const postId = Number(formData.get("postId"));

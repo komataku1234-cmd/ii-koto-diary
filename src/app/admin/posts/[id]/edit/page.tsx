@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { updatePost, deleteReply, restoreReply } from "../../../actions";
+import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 export default async function EditPostPage({
   params,
@@ -46,7 +47,7 @@ export default async function EditPostPage({
             id="nickname"
             name="nickname"
             type="text"
-            maxLength={20}
+            maxLength={MAX_NICKNAME_LENGTH}
             defaultValue={post.nickname}
             placeholder="名無しさん"
             className="rounded-md border border-slate-300 px-3 py-2 text-sm"
@@ -61,7 +62,7 @@ export default async function EditPostPage({
             id="content"
             name="content"
             required
-            maxLength={140}
+            maxLength={MAX_CONTENT_LENGTH}
             rows={4}
             defaultValue={post.content}
             className="rounded-md border border-slate-300 px-3 py-2 text-sm"

@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-
-const MAX_CONTENT_LENGTH = 140;
-const MAX_NICKNAME_LENGTH = 20;
+import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 async function deletePost(formData: FormData) {
   // admin/page.tsxのisAdminAuthenticatedチェックは「ページを描画するとき」にしか働かない。

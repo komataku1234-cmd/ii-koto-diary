@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { addReaction, createReply } from "./actions";
 import { SearchSortForm } from "./SearchSortForm";
+import { MAX_REPLY_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -161,7 +162,7 @@ export default async function Home({
                   <input
                     type="text"
                     name="nickname"
-                    maxLength={20}
+                    maxLength={MAX_NICKNAME_LENGTH}
                     placeholder="名無しさん"
                     className="w-32 self-start rounded-md border border-slate-300 px-2 py-1 text-xs"
                   />
@@ -171,7 +172,7 @@ export default async function Home({
                       type="text"
                       name="content"
                       required
-                      maxLength={30}
+                      maxLength={MAX_REPLY_LENGTH}
                       placeholder="コメントする"
                       className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
                     />
