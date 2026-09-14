@@ -18,31 +18,16 @@
 
 このリポジトリは pnpm と Dev Container を使用しています。`.pnpm-store` や `node_modules` などのビルド成果物は `.gitignore` の対象で、リポジトリには**コミットされていません**。クローン後は自分で依存関係をインストールする必要があります。
 
-### 方法A: VS Code Dev Containers（推奨）
+### VS Code Dev Containers（推奨）
 
 1. リポジトリをクローンし、VS Code で開く。
 2. [Dev Containers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) をインストールしていない場合はインストールする。
 3. **Dev Containers: Reopen in Container** を実行する。Docker イメージがビルドされ、`.devcontainer/devcontainer.json` の `postCreateCommand` によって自動的に `pnpm install` が実行される。
 4. コンテナの準備ができたら、統合ターミナルで `pnpm dev` を実行する。
 
-### 方法B: Docker Compose
-
-```bash
-docker compose up -d
-docker compose exec app pnpm install
-docker compose exec app pnpm dev
-```
-
-### 方法C: ローカルの Node/pnpm
-
-```bash
-corepack enable
-corepack prepare pnpm@latest --activate
-pnpm install
-pnpm dev
-```
-
 セットアップ後、ブラウザで [http://localhost:3001](http://localhost:3001) を開くと確認できます。
+
+Dev Containersを使わない方法（Docker Composeを直接操作する/ローカルのNode.jsを使う）は [docs/setup-alternatives.md](./docs/setup-alternatives.md) を参照してください。
 
 ## 環境変数
 
