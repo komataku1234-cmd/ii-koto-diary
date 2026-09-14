@@ -32,6 +32,7 @@ export function BackToTopButton() {
       // items-center: 箱の中の高さ方向の中央に寄せる
       // justify-center: 箱の中の幅方向の中央に寄せる
       // z-50: 画面上の他の要素よりも前面に出すための優先度(数が大きい方)を指定する。このコードではここしか設定してないためこれが一番上。
+      //shadow-lg: 見た目変わってないようにしか見えないから不採用
       className="fixed right-6 bottom-6 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-900 text-white"
     >
       ↑
