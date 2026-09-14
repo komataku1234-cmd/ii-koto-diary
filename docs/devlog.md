@@ -157,7 +157,7 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 ### 調査した内容
 - フッターとヘッターをどのように使うか
 - 自分の投稿を消せるかどうか
-- 環境構築理解
+- 環境構築理解(Dockerfile,docker-compose,deccontainer)
 - claude codeのコマンドでcode reviewを行った
 
 ### 悩み・疑問
@@ -172,6 +172,7 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 - どちらの方法でもデータベースのカラムを追加が必要。毎回パスワードを考えるのは使用者目線でも面倒だと判断し、クッキーの方がいいが、クッキーも時間で変わったり、
 別ブラウザで立ち上げると自分の投稿だと判断できないためどちらも不採用。
 - code reviewをかなりの精度でしてくれるからしておこう
+- それぞれのコマンドについて理解することができた
 
 ### 設計
 - フッターに画面の一番上に移動できるボタンを作成
