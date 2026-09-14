@@ -1,11 +1,11 @@
-services:
+services:            #複数コンテナを作るためのサービス定義の開始
   app:
-    build: .
+    build: .           #Dockerfileを使ってイメージをビルドする
     container_name: ii-koto-diary-app
     volumes:
-      - .:/app                      # ソースコードをマウント
-      - node_modules:/app/node_modules  # node_modules は名前付きボリュームで高速化
-    working_dir: /app
+      - .:/app                      # ソースコードをマウント バインドマウント
+      - node_modules:/app/node_modules  # node_modules は名前付きボリュームで高速化 ボリュームマウント
+    working_dir: /app #Dockerfileより優先
     ports:
       - "3001:3001"
     command: sleep infinity         # Dev Container 用に待機させる
