@@ -10,7 +10,7 @@
     "vscode": {          //vscodeの拡張機能をコンテナ内に入れるための設定
       "extensions": [       //拡張機能をコンテナ内に入れるための設定
         "dbaeumer.vscode-eslint",      //ESLintをエディタに統合し、保存前にリアルタイムで指摘してくれる
-        "esbenp.prettier-vscode",      //Prettier(コード整形)をエディタに統合する
+        "esbenp.prettier-vscode",      //Prettier(コード整形)をエディタに統合する 今は手動で整形するために使う　settings.jsonがあれば保存時に自動で整形することもできる
         "bradlc.vscode-tailwindcss"      //Tailwindのクラス名補完・プレビュー(ホバーで実際のCSSが見れる)
       ]
     }
