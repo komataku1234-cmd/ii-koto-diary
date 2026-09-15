@@ -1,28 +1,32 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
+    "target": "ES2017",   //型チェックの基準にするJSのバージョン
+    //ブラウザの標準API全般の型情報(window.addEventListenerとか)を使えるようにする interble:for...ofを使えるように　
+    //esnext: 最新のJS標準機能 (今回は使ってない。将来性で入れてる感じ)
+    "lib": ["dom", "dom.iterable", "esnext"], 
+    "allowJs": true,    //js,tsとtsxをチェック対象にしていいよ(これ入れないとtsとtsxだけ)
+    "skipLibCheck": true,     //他人の型定義ファイルのチェックをスキップ
+    "strict": true,    //厳格な型チェックをまとめてオンにする
+    "noEmit": true,    //型チェックのみ行い、JSファイルは出力しない(JSへの変換はNext.js自身のSWCが担当)
+    "esModuleInterop": true,    //古い形式(CommonJS)のパッケージもimport文で違和感なく読み込めるようにする(見たことないimport方法だった)
+    "module": "esnext",    //import/exportを最新のES Modules形式として扱う
+    "moduleResolution": "bundler",    //importの解決方法を、Next.jsのような最新のバンドラーのやり方に合わせる(tsとか書かなくても読み取ってくれる)
+    "resolveJsonModule": true,    //.jsonファイルも直接importできるようにする
+    //各ファイルが他のファイルの情報無しで単独でも正しく変換できることを保証する(SWCが1ファイルずつ変換するため)
+    // typeをつける(export type { User } from "./types"; こんな感じ)
+    "isolatedModules": true,   
+    "jsx": "react-jsx",    //JSXの新しい変換方式。各ファイルでimport Reactを書かなくてよくなる
+    "incremental": true,    //前回の型チェック結果をキャッシュして次回を高速化する(.tsbuildinfoを生成、.gitignore対象)
     "plugins": [
       {
-        "name": "next"
+        "name": "next"    //Next.js専用の型チェック・エディタ補完を追加するプラグイン
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"]    //"@/lib/prisma"のような書き方を"./src/lib/prisma"に読み替えるエイリアス設定
     }
   },
-  "include": [
+  "include": [    //型チェックの対象にするファイル
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
@@ -30,5 +34,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"]    //対象外(他人のコードなので除外)
 }
