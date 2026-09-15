@@ -76,6 +76,18 @@ eslint.config.mjsでどのくらい厳しくチェックするとか決めてる
 - `@prisma/client` → 実行時にDBへ問い合わせるためのクライアント
 - `@prisma/adapter-pg` → PrismaがPostgreSQLに接続するためのアダプタ
 
+### `^`の付き方に規則性は無い
+
+`dependencies`の中でも、`next`/`react`/`react-dom`だけ`^`無し(完全固定)で、
+`@prisma/client`/`@prisma/adapter-pg`は`^`付き(幅あり)。「dependenciesだから
+厳しく固定している」という規則ではない。
+
+- `next`/`react`/`react-dom`が完全固定なのは、`create-next-app`が最初から
+  そう設計しているため。この3つはお互いの組み合わせが厳密で、バージョンが
+  少しズレるだけで動かなくなることがあるため、Next.js側が固定を推奨している
+- Prisma関連が`^`付きなのは、後から`pnpm add`で追加した時の**pnpmのデフォルトの
+  挙動**がそうなっているだけで、意図した使い分けではない
+
 ### `devDependencies`(開発・ビルド時だけ必要)
 
 - `typescript` → JSに変換するのはビルド時だけ。動いているアプリはただのJS
