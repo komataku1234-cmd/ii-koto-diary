@@ -1,9 +1,4 @@
-# 本来このファイル名はモノレポ(1リポジトリに複数パッケージ)用の設定だが、
-# このプロジェクトは単一パッケージなので、ここでは別の目的(下記)で使っている。
-#
-# 最近のpnpmは、パッケージのインストール時に自動実行されるスクリプトを
-# セキュリティ対策としてデフォルトでブロックする。実行を許可するかどうかを
-# ここで管理している(pnpm approve-buildsコマンドで対話的に決められる)。
+#セキュリティブロック無効
 allowBuilds:
   sharp: true              # 画像処理ライブラリ。next/imageの最適化機能で使用、OS向けの実体が必要
   unrs-resolver: true
@@ -11,9 +6,3 @@ allowBuilds:
   '@prisma/engines': true   # 実際のDBエンジンの実体をダウンロード・準備するために必要
   esbuild: true             # 高速な変換ツール。OSに合わせた実体を用意する必要がある
 
-# インストール時のスクリプトを意図的に実行しない(無視する)と決めたもの。
-# 毎回警告を出さないようにする記録。sharp/unrs-resolverがallowBuildsにも
-# 存在する理由(両方に登場する優先順位の仕組み)は未確認。
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
