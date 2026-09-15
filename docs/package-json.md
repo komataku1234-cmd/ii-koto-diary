@@ -61,8 +61,8 @@ Dockerfileの`--activate`で設定した初期値より**そちらを優先**す
 
 - `dev` → `next dev -p 3001`(開発サーバー起動、ポートは3001に固定)
 - `build` → `prisma migrate deploy && prisma generate && next build`
-  (DBマイグレーション適用→Prismaクライアント生成→Next.jsの本番ビルド、の順)
-- `start` → `next start`(ビルド済みのものを本番モードで起動。) vercelは独自でやるため使ってない     
+  (DBマイグレーション適用→Prismaクライアント生成→Next.jsの本番ビルド、の順) 確認のためpnpm build からpnpm startで確認できる
+- `start` → `next start`(ビルド済みのものを本番モードで起動。) vercelは独自でやるため使ってない  一応確認はできる。DBはposgresだけど   
 - `lint` → `eslint`(コードチェック)　pnpm lint →ファイル全体 pnpm exec eslint src/app/error.tsx →特定のファイル
 eslint.config.mjsでどのくらい厳しくチェックするとか決めてる
 

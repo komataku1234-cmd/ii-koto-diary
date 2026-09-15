@@ -192,19 +192,21 @@ INSERT INTO "ReactionType" (name, emoji) VALUES
 - pakage.json
 - tsconfig.json
 - next.config.ts
-- 
+- src/lib/prisma.tsのシングルトンパターン
 
 ### 悩み・疑問
 - 前回使用していた環境構築のまま特に考えずに進めていたが、意外と使ってない環境設定が多いなと感じた。色々できるようにあらかじめ広めに作ってるって感じだった
 
 ### 学習した内容
 - Docker関連以外は見てなかったが、コンパイルのエラーを表示させたりしているのがtsconfigなので、ある程度知っている必要があると思った。
+- isolatedModulesがあるため、型だけのexportにはexport typeが必要(SWCが1ファイルずつ変換するため)
+- globalThisを使ったPrismaClientのシングルトンパターンで、開発中のホットリロードによるDB接続過多を防いでいる
 
 ### 設計
--
+- pnpm-workspace.yamlの説明できないignoredBuiltDependenciesを、動作確認した上で削除して整理した
 
 ### 仕様
--
+- 特に変更なし
 
 
 ## テンプレート(コピーして使う)
