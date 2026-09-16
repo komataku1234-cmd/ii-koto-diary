@@ -28,7 +28,8 @@ export function SearchSortForm({
         // form.submit()と違い、requestSubmit()は実際にボタンを押したのと同じ扱いになる
         // (HTML標準のバリデーションも効くし、送信ボタンのイベントも正しく発火する)。
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+        // selectもbuttonと同じくデフォルトではcursor:defaultのままポインターに変わらないため明示的に指定する
+        className="cursor-pointer rounded-md border border-slate-300 px-3 py-2 text-sm"
       >
         <option value="new">新着順</option>
         {reactionTypes.map((reactionType) => (
@@ -37,10 +38,12 @@ export function SearchSortForm({
           </option>
         ))}
       </select>
-      {/* shrink-0 → 隣のinput(伸びる)に押し潰されないように、幅固定で縮まないようにする */}
+      {/* shrink-0 → 隣のinput(伸びる)に押し潰されないように、幅固定で縮まないようにする。
+          cursor-pointer → buttonはaタグと違いデフォルトではポインターにならない(cursor:default)ため、
+          明示的に指定する */}
       <button
         type="submit"
-        className="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+        className="shrink-0 cursor-pointer rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
       >
         検索
       </button>

@@ -3,9 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-
-const MAX_CONTENT_LENGTH = 140;
-const MAX_NICKNAME_LENGTH = 20;
+import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 export async function createPost(formData: FormData) {
   // formData.get()の型はFormDataEntryValue(=string|File)|null。

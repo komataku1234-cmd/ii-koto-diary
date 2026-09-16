@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackToTopButton } from "../BackToTopButton";
 
 export default function Footer() {
   return (
@@ -9,6 +10,8 @@ export default function Footer() {
           管理者ログイン
         </Link>
       </div>
+      {/* Footer自体はServer Componentのまま、ボタン部分だけClient Componentを埋め込む */}
+      <BackToTopButton />
     </footer>
   );
 }

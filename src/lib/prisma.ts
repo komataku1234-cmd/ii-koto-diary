@@ -1,5 +1,5 @@
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'       //PrismaPg は PostgreSQL と実際に通信するドライバー
+import { PrismaClient } from '@/generated/prisma/client'  // src/generated/prismaに自動生成してたもの
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 

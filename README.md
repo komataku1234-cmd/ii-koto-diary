@@ -2,10 +2,44 @@
 
 「今日あったちょっといいこと」を匿名で投稿し、みんなの投稿がタイムライン形式で流れる日記共有アプリです。
 
-- 一般ユーザーはアカウント登録・ログイン不要で投稿・閲覧・リアクションができます。
-- 管理者は固定パスワードでログインし、全投稿の検索・編集・削除（ソフトデリート）を行えます。
+## 主な機能
+
+### 一般ユーザー（ログイン不要）
+
+- ニックネーム任意で「今日あったちょっといいこと」を投稿（140文字以内）
+- タイムラインで全員の投稿を新着順に閲覧
+- 本文・ニックネームでのキーワード検索
+- 新着順／リアクション種類ごと（👍いいね・🙌わかる・🥰ほっこり）の多い順で並び替え
+- 投稿へのリアクション付与
+- 各投稿へのコメント（30文字以内、ニックネーム任意）
+- スクロール中にページ先頭へ戻るボタン
+
+### 管理者
+
+- 固定パスワードでログイン（ログイン後12時間は再入力不要）
+- 削除済みも含めた全投稿の一覧・検索
+- 投稿の本文・ニックネームの編集
+- 投稿・コメントのソフトデリート、および削除済み投稿の復元
+
+### その他
+
+- Server Actionで発生したエラー（バリデーション失敗など）を、Next.js標準の簡素な画面ではなく専用のエラー画面（`error.tsx`/`global-error.tsx`）で表示
 
 詳しい要件は [requirements.md](./requirements.md) を参照してください。
+
+## スクリーンショット
+
+| タイムライン | 投稿 |
+|---|---|
+| ![タイムライン画面](./docs/image/main.png) | ![投稿画面](./docs/image/post.png) |
+
+| 管理者ログイン | 管理者画面（投稿一覧） |
+|---|---|
+| ![管理者ログイン画面](./docs/image/login.png) | ![管理者画面](./docs/image/admin.png) |
+
+| 投稿編集画面 |
+|---|
+| ![投稿編集画面](./docs/image/update.png) |
 
 ## 技術スタック
 
@@ -18,31 +52,16 @@
 
 このリポジトリは pnpm と Dev Container を使用しています。`.pnpm-store` や `node_modules` などのビルド成果物は `.gitignore` の対象で、リポジトリには**コミットされていません**。クローン後は自分で依存関係をインストールする必要があります。
 
-### 方法A: VS Code Dev Containers（推奨）
+### VS Code Dev Containers（推奨）
 
 1. リポジトリをクローンし、VS Code で開く。
 2. [Dev Containers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) をインストールしていない場合はインストールする。
 3. **Dev Containers: Reopen in Container** を実行する。Docker イメージがビルドされ、`.devcontainer/devcontainer.json` の `postCreateCommand` によって自動的に `pnpm install` が実行される。
 4. コンテナの準備ができたら、統合ターミナルで `pnpm dev` を実行する。
 
-### 方法B: Docker Compose
-
-```bash
-docker compose up -d
-docker compose exec app pnpm install
-docker compose exec app pnpm dev
-```
-
-### 方法C: ローカルの Node/pnpm
-
-```bash
-corepack enable
-corepack prepare pnpm@latest --activate
-pnpm install
-pnpm dev
-```
-
 セットアップ後、ブラウザで [http://localhost:3001](http://localhost:3001) を開くと確認できます。
+
+Dev Containersを使わない方法（Docker Composeを直接操作する/ローカルのNode.jsを使う）は [docs/setup-alternatives.md](./docs/setup-alternatives.md) を参照してください。
 
 ## 環境変数
 

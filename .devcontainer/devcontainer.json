@@ -1,17 +1,17 @@
 {
   "name": "ii-koto-diary",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "app",
-  "workspaceFolder": "/app",
-  "shutdownAction": "stopCompose",
-  "forwardPorts": [3001, 5555],
-  "postCreateCommand": "pnpm install",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+  "dockerComposeFile": "../docker-compose.yml",      //どのdocker-compose.ymlを使うか
+  "service": "app",      //docker-compose.ymlのservicesのうち、VS Codeが接続する先(dbには接続しない)
+  "workspaceFolder": "/app",      //コンテナ内の作業ディレクトリ yamlとかと一緒
+  "shutdownAction": "stopCompose",      //vscodeを閉じた時、コンテナを閉じた時にコンテナを停止する
+  "forwardPorts": [3001, 5555],      //vscodeの独自機能、だからなくても一応動く vscodeのブラウザで開くときに使うポート番号
+  "postCreateCommand": "pnpm install",          //コンテナが初めて作られた、その直後に実行されるコマンド　ボリュームが生成されてから実行させたいためDockerfileではなくこちらに書く
+  "customizations": {          //エディタの設定(vscode以外もエディタの設定ができる)
+    "vscode": {          //vscodeの拡張機能をコンテナ内に入れるための設定
+      "extensions": [       //拡張機能をコンテナ内に入れるための設定
+        "dbaeumer.vscode-eslint",      //ESLintをエディタに統合し、保存前にリアルタイムで指摘してくれる
+        "esbenp.prettier-vscode",      //Prettier(コード整形)をエディタに統合する 今は手動で整形するために使う　settings.jsonがあれば保存時に自動で整形することもできる
+        "bradlc.vscode-tailwindcss"      //Tailwindのクラス名補完・プレビュー(ホバーで実際のCSSが見れる)
       ]
     }
   }

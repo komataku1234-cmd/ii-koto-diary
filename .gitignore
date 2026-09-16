@@ -49,3 +49,6 @@ next-env.d.ts
 .claude/
 .windsurf/
 skills-lock.json
+
+# 口頭ディフェンス対策メモ(個人用、公開しない)
+docs/oral-defense.md

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { addReaction, createReply } from "./actions";
 import { SearchSortForm } from "./SearchSortForm";
+import { MAX_REPLY_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -31,8 +32,8 @@ export default async function Home({
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
         // 本文・ニックネームのどちらかに部分一致すればヒットさせる
-        //スプレッドがないと文法エラー。
-        ...(keyword? 
+        //スプレッドがないと文法エラー。オブジェクトとして出てくるから
+        ...(keyword?
             {
               OR: [
                 { content: { contains: keyword, mode: "insensitive" } },
@@ -43,7 +44,6 @@ export default async function Home({
       },
       orderBy: { createdAt: "desc" },
       include: {
-        reactions: true,//全部取得
         replies: {//条件付きで取得
           where: { deletedAt: null },
           orderBy: { createdAt: "asc" }, // 投稿は新着順だが、コメントは会話の流れが分かるよう古い順にする
@@ -53,21 +53,38 @@ export default async function Home({
     prisma.reactionType.findMany({ orderBy: { id: "asc" } }),
   ]);
 
+  // リアクションの生データは取得せず、投稿×絵文字の組み合わせごとの件数だけをDB側(groupBy)で集計する。
+  // 生データを1件ずつ運んでJSでfilterする方式だと、リアクションが増えるほど転送量・計算量が増えてしまうため。
+  //postIds=[1,2,3]
+  const postIds = posts.map((post) => post.id);
+  const reactionCounts = await prisma.reaction.groupBy({
+    by: ["postId", "reactionTypeId"],
+    where: { postId: { in: postIds } },
+    _count: true,
+  });
+
+  // postId→reactionTypeId→件数 の2段構えのMapにして、後で使うときにO(1)で引けるようにする
+  const reactionCountMap = new Map<number, Map<number, number>>();
+  for (const rc of reactionCounts) {
+    if (!reactionCountMap.has(rc.postId)) {
+      reactionCountMap.set(rc.postId, new Map());
+    }
+    // !:undefinedを否定
+    reactionCountMap.get(rc.postId)!.set(rc.reactionTypeId, rc._count);
+  }
+  //eactionCountMap.get(postId)でundefinedだったら.get(reactionTypeId) を実行しない。0を投げる
+  const getReactionCount = (postId: number, reactionTypeId: number) =>
+    reactionCountMap.get(postId)?.get(reactionTypeId) ?? 0;
+
   // 特定の絵文字(リアクション種類)が多い順のときだけ、取得済みのpostsをJS側で並び替える。
-  // Prismaのリレーション件数ソート(_count)は「全種類合計」しか数えられず、
-  // 「この絵文字だけの件数」でソートする方法が無いため、JSで数えて並び替えている。
+  // 並び替え自体はJSで行うが、件数そのものはDBのgroupByで集計済みのMapから引くだけ。
   // Number.isIntegerのチェックが無いと、?sort=abc のような不正な値で
   // Number("abc")=NaNになった場合もif文を素通りしてしまう
   // (NaNはundefinedではないため)。並び替え自体が無意味になるので念のため弾く。
   if (sortReactionTypeId !== undefined && Number.isInteger(sortReactionTypeId)) {
     posts.sort((a, b) => {
-      // 投稿ごとに「選ばれた絵文字と一致するリアクション」だけ数える
-      const countA = a.reactions.filter(
-        (r) => r.reactionTypeId === sortReactionTypeId
-      ).length;
-      const countB = b.reactions.filter(
-        (r) => r.reactionTypeId === sortReactionTypeId
-      ).length;
+      const countA = getReactionCount(a.id, sortReactionTypeId);
+      const countB = getReactionCount(b.id, sortReactionTypeId);
       // 多い順(降順)にしたいので「後-前」。逆にすると少ない順になる　sortにreturn 0を返すと順序は変わらない
       return countB - countA;
     });
@@ -92,7 +109,11 @@ export default async function Home({
                 {/* items-baseline → 文字サイズ(text-sm と text-xs)が違う2つを並べたとき、
                     中央揃え(items-center)だと微妙にズレて見えるので、文字のベースライン(下端の基準線)で揃える */}
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-medium">
+                  {/* truncate → whitespace-nowrap(1行固定)+overflow-hidden(隠す)+text-overflow-ellipsis(...にする)をまとめて指定。
+                      横スクロールの受け皿が無いページなので、はみ出さずに"..."で省略させる。
+                      min-w-0 → flexの子要素はデフォルトで「中身の幅より縮めない」性質があり、
+                      これが無いとtruncateが効かずニックネームが縮まないままはみ出してしまう */}
+                  <span className="min-w-0 truncate text-sm font-medium">
                     {/* nicknameは未入力でもDBの@defaultで必ず文字列が入っているため穴埋め不要 */}
                     {post.nickname}
                   </span>
@@ -125,11 +146,7 @@ export default async function Home({
                         className="rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
                       >
                         {reactionType.emoji}{" "}
-                        {
-                          post.reactions.filter(
-                            (r) => r.reactionTypeId === reactionType.id
-                          ).length
-                        }
+                        {getReactionCount(post.id, reactionType.id)}
                       </button>
                     </form>
                   ))}
@@ -157,7 +174,7 @@ export default async function Home({
                   <input
                     type="text"
                     name="nickname"
-                    maxLength={20}
+                    maxLength={MAX_NICKNAME_LENGTH}
                     placeholder="名無しさん"
                     className="w-32 self-start rounded-md border border-slate-300 px-2 py-1 text-xs"
                   />
@@ -167,13 +184,15 @@ export default async function Home({
                       type="text"
                       name="content"
                       required
-                      maxLength={30}
+                      maxLength={MAX_REPLY_LENGTH}
                       placeholder="コメントする"
                       className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
                     />
+                    {/* cursor-pointer → buttonはaタグと違いデフォルトではポインターにならない(cursor:default)ため、
+                        明示的に指定する */}
                     <button
                       type="submit"
-                      className="shrink-0 rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white"
+                      className="shrink-0 cursor-pointer rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white"
                     >
                       送信
                     </button>

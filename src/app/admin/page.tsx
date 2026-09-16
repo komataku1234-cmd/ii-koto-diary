@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { deletePost } from "./actions";
+import { deletePost, restorePost } from "./actions";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -26,23 +26,28 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* justify-between:両端に子要素を寄せて、余った隙間を要素の間だけに均等配置 */}
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">管理者画面 - 投稿一覧</h2>
         <Link href="/" className="text-sm text-slate-500 hover:underline">
           ← タイムラインに戻る
         </Link>
       </div>
-
+      {/* overflow-x-auto:横方向のはみ出しをスクロールバーで対応 今回でないように修正をかけたから多分出ることない*/}
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
+        {/* table-fixed → table-layout:fixedにする。デフォルト(auto)は中身の最大幅を基準に
+            列幅を決めるため、truncateを付けても表全体がはみ出してスクロールバーが出てしまう。
+            fixedならこのthに書いた幅(w-*)で列幅が固定され、本文列だけ幅指定を省略して
+            残りの余白を全部本文に回している */}
+        <table className="w-full table-fixed text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
             <tr>
-              <th className="px-3 py-2">ID</th>
-              <th className="px-3 py-2">ニックネーム</th>
+              <th className="w-10 px-3 py-2">ID</th>
+              <th className="w-24 whitespace-nowrap px-3 py-2">ニックネーム</th>
               <th className="px-3 py-2">本文</th>
-              <th className="px-3 py-2">投稿日時</th>
-              <th className="px-3 py-2">状態</th>
-              <th className="px-3 py-2"></th>
+              <th className="w-30 px-3 py-2">投稿日時</th>
+              <th className="w-20 px-3 py-2">状態</th>
+              <th className="w-36 px-3 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -50,8 +55,13 @@ export default async function AdminPage() {
               // last:border-0 → 一番最後の行だけ下線(border-b)を消す。CSSの:last-childに相当するTailwindの記法
               <tr key={post.id} className="border-b border-slate-100 last:border-0">
                 <td className="px-3 py-2 text-slate-500">{post.id}</td>
-                <td className="px-3 py-2">{post.nickname}</td>
-                <td className="px-3 py-2">{post.content}</td>
+                {/* table-fixedで幅はw-24に固定済みなので、本文と同じくtruncateだけで
+                    省略表示できる(max-w指定は不要) */}
+                <td className="truncate px-3 py-2">{post.nickname}</td>
+                {/* table-fixedにしたことでこの列の幅は「他の列の残り全部」になっているので、
+                    max-w-xsは不要。truncateだけでその幅からはみ出た分を...で省略できる */}
+                <td className="truncate px-3 py-2">{post.content}</td>
+                {/* whitespace-nowrap:改行せずに1行で表示する。*/}
                 <td className="px-3 py-2 whitespace-nowrap text-slate-500">
                   {dateFormatter.format(post.createdAt)}
                 </td>
@@ -67,7 +77,19 @@ export default async function AdminPage() {
                   )}
                 </td>
                 <td className="px-3 py-2">
-                  {!post.deletedAt && (
+                  {post.deletedAt ? (
+                    // 物理削除ではなくソフトデリートなので、誤って削除しても
+                    // deletedAtをnullに戻すだけで元通りに復元できる
+                    <form action={restorePost}>
+                      <input type="hidden" name="postId" value={post.id} />
+                      <button
+                        type="submit"
+                        className="cursor-pointer rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                      >
+                        復元
+                      </button>
+                    </form>
+                  ) : (
                     <div className="flex gap-2">
                       <Link
                         href={`/admin/posts/${post.id}/edit`}
@@ -82,7 +104,7 @@ export default async function AdminPage() {
                         <input type="hidden" name="postId" value={post.id} />
                         <button
                           type="submit"
-                          className="rounded-md border border-red-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                          className="cursor-pointer rounded-md border border-red-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
                         >
                           削除
                         </button>

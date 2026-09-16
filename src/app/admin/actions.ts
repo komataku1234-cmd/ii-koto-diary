@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-
-const MAX_CONTENT_LENGTH = 140;
-const MAX_NICKNAME_LENGTH = 20;
+import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 async function deletePost(formData: FormData) {
   // admin/page.tsxのisAdminAuthenticatedチェックは「ページを描画するとき」にしか働かない。
@@ -81,10 +79,32 @@ async function updatePost(formData: FormData) {
           : "名無しさん",
     },
   });
-
+  // revalidatePath:古いキャッシュを無効化
   revalidatePath("/admin");
   revalidatePath("/");
   redirect("/admin");
+}
+
+async function restorePost(formData: FormData) {
+  // deletePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
+  if (!(await isAdminAuthenticated())) {
+    throw new Error("権限がありません。");
+  }
+
+  const postId = Number(formData.get("postId"));
+  if (!Number.isInteger(postId)) {
+    throw new Error("不正なリクエストです。");
+  }
+
+  // deletedAtをnullに戻すだけ。物理削除していない(ソフトデリート)ので、
+  // 誤って削除しても元通りに復元できる
+  await prisma.post.update({
+    where: { id: postId },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/");
 }
 
 async function deleteReply(formData: FormData) {
@@ -109,4 +129,26 @@ async function deleteReply(formData: FormData) {
   revalidatePath("/");
 }
 
-export { deletePost, updatePost, deleteReply };
+async function restoreReply(formData: FormData) {
+  // deletePost/updatePostと同じ理由(直接POSTされうるため多層防御、throwで拒否する理由もdeletePostのコメント参照)
+  if (!(await isAdminAuthenticated())) {
+    throw new Error("権限がありません。");
+  }
+
+  const replyId = Number(formData.get("replyId"));
+  const postId = Number(formData.get("postId"));
+  if (!Number.isInteger(replyId) || !Number.isInteger(postId)) {
+    throw new Error("不正なリクエストです。");
+  }
+
+  // restorePostと同じ理由(deletedAtをnullに戻すだけで、ソフトデリートなので元通りに復元できる)
+  await prisma.reply.update({
+    where: { id: replyId },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath(`/admin/posts/${postId}/edit`);
+  revalidatePath("/");
+}
+
+export { deletePost, updatePost, deleteReply, restorePost, restoreReply };
