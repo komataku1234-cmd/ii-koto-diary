@@ -4,6 +4,9 @@ import { useActionState } from "react";
 import { login } from "./actions";
 
 export function LoginForm() {
+  // state:loginが最後に返す値、または第二引数(初期値)
+  // formAction:呼ばれた時にloginを呼びたして、stateに渡す
+  // pending:実行中かどうか
   const [state, formAction, pending] = useActionState(login, {});
 
   return (

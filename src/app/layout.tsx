@@ -11,6 +11,7 @@ export default function RootLayout({
   header,
   footer,
 }: Readonly<{
+  // React.ReactNode:reactが描画できる型
   children: React.ReactNode;
   header: React.ReactNode;
   footer: React.ReactNode;

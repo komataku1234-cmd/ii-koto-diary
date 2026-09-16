@@ -41,6 +41,7 @@ export default function Error({
         {/* unstable_retry → このエラーが発生した部分(セグメント)をサーバーから再取得・再描画する。 */}
         <button
           type="button"
+          //unstable_retry:エラー入ったURLを実行し直す
           onClick={() => unstable_retry()}
           className="cursor-pointer rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
         >

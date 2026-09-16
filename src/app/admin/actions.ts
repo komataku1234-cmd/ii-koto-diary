@@ -79,7 +79,7 @@ async function updatePost(formData: FormData) {
           : "名無しさん",
     },
   });
-
+  // revalidatePath:古いキャッシュを無効化
   revalidatePath("/admin");
   revalidatePath("/");
   redirect("/admin");

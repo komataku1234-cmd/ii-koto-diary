@@ -35,6 +35,7 @@ export default function GlobalError({
           )}
           <button
             type="button"
+            //unstable_retry:エラー入ったURLを実行し直す
             onClick={() => unstable_retry()}
             className="cursor-pointer self-start rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
           >
