@@ -21,10 +21,10 @@ export async function isAdminAuthenticated() {
 export async function setAdminAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_COOKIE_NAME, adminAuthToken(), {
-    httpOnly: true, // JSから読めなくしてXSSでの値の盗み見を防ぐ Cookieの中身を見せなくする
+    httpOnly: true, // JSから読めなくしてXSSでの値の盗み見を防ぐ Cookieの中身を見せなくする xss:攻撃者がそのページ上で動くJavaScriptを不正に紛れ込ませる攻撃
     secure: process.env.NODE_ENV === "production", // 本番はHTTPS限定で盗聴を防ぐ(ローカル開発はhttpなのでdevでは無効化)
-    sameSite: "lax", // 他サイトからの裏側のリクエストにはCookie付けずCSRFを防ぐ これしないと管理者操作ができてしまう可能性がある
+    sameSite: "lax", // 他サイトからの裏側のリクエストにはCookie付けずCSRFを防ぐ これしないと管理者操作ができてしまう可能性がある CSRF:攻撃者が用意した別サイトに、あなたのアプリへの隠しリクエストを仕込んでおき、それをログイン中の被害者に気づかせずに実行させる攻撃です。
     maxAge: ADMIN_COOKIE_MAX_AGE, // この時間が経つと自動失効し、要件通り再ログインが必要になる
-    path: "/", // サイト全体でこのCookieを有効にする
+    path: "/admin", // 管理者機能で使う場所だけに絞る(最小権限。他ページへのリクエストには不要に付けない)
   });
 }
