@@ -173,7 +173,7 @@ export default async function Home({
                   <input
                     type="text"
                     name="nickname"
-                    maxLength={20}
+                    maxLength={MAX_NICKNAME_LENGTH}
                     placeholder="名無しさん"
                     className="w-32 self-start rounded-md border border-slate-300 px-2 py-1 text-xs"
                   />
