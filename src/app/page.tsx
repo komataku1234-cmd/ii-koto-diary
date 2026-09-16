@@ -32,7 +32,7 @@ export default async function Home({
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
         // 本文・ニックネームのどちらかに部分一致すればヒットさせる
-        //スプレッドがないと文法エラー。
+        //スプレッドがないと文法エラー。オブジェクトとして出てくるから
         ...(keyword?
             {
               OR: [
@@ -55,6 +55,7 @@ export default async function Home({
 
   // リアクションの生データは取得せず、投稿×絵文字の組み合わせごとの件数だけをDB側(groupBy)で集計する。
   // 生データを1件ずつ運んでJSでfilterする方式だと、リアクションが増えるほど転送量・計算量が増えてしまうため。
+  //postIds=[1,2,3]
   const postIds = posts.map((post) => post.id);
   const reactionCounts = await prisma.reaction.groupBy({
     by: ["postId", "reactionTypeId"],

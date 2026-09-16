@@ -5,7 +5,7 @@ services:            #複数コンテナを作るためのサービス定義の�
     volumes:
       - .:/app                      # ソースコードをマウント バインドマウント
       - node_modules:/app/node_modules  # node_modules は名前付きボリュームで高速化 ボリュームマウント
-    working_dir: /app #Dockerfileより優先
+    working_dir: /app                         #Dockerfileと一緒のパスにする
     ports:
       - "3001:3001"                    #左ローカルホスト、右コンテナ内のポート番号(package.jsonのscriptsのdevで指定したポート番号)
     command: sleep infinity         # Dev Container 用に待機させる　起動し続ける
