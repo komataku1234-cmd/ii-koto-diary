@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { MAX_REPLY_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
+import { getReacted, reactedKey, saveReacted } from "@/lib/reactedCookie";
 
 export async function addReaction(formData: FormData) {
   const postId = Number(formData.get("postId"));
@@ -14,9 +15,29 @@ export async function addReaction(formData: FormData) {
     throw new Error("不正なリクエストです。");
   }
 
-  await prisma.reaction.create({
-    data: { postId, reactionTypeId },
-  });
+  const reacted = await getReacted();
+  const key = reactedKey(postId, reactionTypeId);
+
+  if (reacted.has(key)) {
+    // 取り消し: Reactionの行には持ち主の区別が無いので、同じ投稿・同じ絵文字の行を1つ消す。
+    // deleteだと行が既に無いときにエラーになるため、IDを指定したdeleteManyで消す
+    const target = await prisma.reaction.findFirst({
+      where: { postId, reactionTypeId },
+      orderBy: { id: "desc" },
+      select: { id: true },
+    });
+    if (target) {
+      await prisma.reaction.deleteMany({ where: { id: target.id } });
+    }
+    reacted.delete(key);
+  } else {
+    await prisma.reaction.create({
+      data: { postId, reactionTypeId },
+    });
+    reacted.add(key);
+  }
+
+  await saveReacted(reacted);
 
   // このページ("/")のフォームから呼ばれる想定なのでredirectはせず、
   // 最新のリアクション件数が表示されるようキャッシュだけ更新する

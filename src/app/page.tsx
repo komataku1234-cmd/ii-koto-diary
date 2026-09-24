@@ -2,14 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { addReaction, createReply } from "./actions";
 import { SearchSortForm } from "./SearchSortForm";
 import { MAX_REPLY_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
+import { getReacted, reactedKey } from "@/lib/reactedCookie";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
   hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "Asia/Tokyo", // サーバー(コンテナ)のタイムゾーンがUTCなので、表示だけ日本時間に変換する
+  minute: "2-digit",//2026/09/16 13:33的な
+  timeZone: "Asia/Tokyo", // サーバー(コンテナ)のタイムゾーンがUTC(デフォ)なので、表示だけ日本時間に変換する
 });
 
 export default async function Home({
@@ -20,6 +21,7 @@ export default async function Home({
   // searchParamsはリクエスト時にしか値が分からないためPromiseになっている(このNext.jsのバージョンの仕様)
   //分割代入  q=query
   const { q, sort } = await searchParams;
+  const reacted = await getReacted();
   //データあればtrim()して前後の空白を除去、無ければ又は空文字ならundefinedにする
   const keyword = q?.trim() || undefined;
   // sortには"new"(新着順)か、リアクション種類のid(文字列)が入る。未指定時は新着順扱い
@@ -146,23 +148,35 @@ export default async function Home({
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">{/* flex-wrap → 横幅が足りなくなったら折り返す */}
                   {/* 押されていない種類も0件のボタンとして常に表示し、押せるようにする */}
-                  {reactionTypes.map((reactionType) => (
-                    <form key={reactionType.id} action={addReaction}>
-                      <input type="hidden" name="postId" value={post.id} />
-                      <input
-                        type="hidden"
-                        name="reactionTypeId"
-                        value={reactionType.id}
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
-                      >
-                        {reactionType.emoji}{" "}
-                        {getReactionCount(post.id, reactionType.id)}
-                      </button>
-                    </form>
-                  ))}
+                  {reactionTypes.map((reactionType) => {
+                    // このブラウザが既に押した(トグルON)かどうか
+                    const pressed = reacted.has(
+                      reactedKey(post.id, reactionType.id)
+                    );
+                    return (
+                      <form key={reactionType.id} action={addReaction}>
+                        <input type="hidden" name="postId" value={post.id} />
+                        <input
+                          type="hidden"
+                          name="reactionTypeId"
+                          value={reactionType.id}
+                        />
+                        {/* aria-pressed → トグルボタンの現在の状態(押した/押していない)をスクリーンリーダーに伝える */}
+                        <button
+                          type="submit"
+                          aria-pressed={pressed}
+                          className={
+                            pressed
+                              ? "rounded-full bg-slate-900 px-2 py-1 text-xs text-white hover:bg-slate-700"
+                              : "rounded-full bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200"
+                          }
+                        >
+                          {reactionType.emoji}{" "}
+                          {getReactionCount(post.id, reactionType.id)}
+                        </button>
+                      </form>
+                    );
+                  })}
                 </div>
                 {post.replies.length > 0 && (
                   <ul className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
