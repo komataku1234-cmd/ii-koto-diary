@@ -31,13 +31,26 @@ export default async function Home({
       where: {
         deletedAt: null,
         // キーワードが無ければ絞り込み条件自体を付けない(未入力時は全件表示)
-        // 本文・ニックネームのどちらかに部分一致すればヒットさせる
+        // 投稿の本文・ニックネーム、またはコメントの本文・ニックネームのどれかに部分一致すればヒットさせる
+        // コメントは「1件でも一致するものがある(some)」投稿を対象にする。
+        // 削除済みコメントは画面に表示されないので、それで投稿がヒットしないよう deletedAt: null も条件に入れる
         //スプレッドがないと文法エラー。オブジェクトとして出てくるから
         ...(keyword?
             {
               OR: [
                 { content: { contains: keyword, mode: "insensitive" } },
                 { nickname: { contains: keyword, mode: "insensitive" } },
+                {
+                  replies: {
+                    some: {
+                      deletedAt: null,
+                      OR: [
+                        { content: { contains: keyword, mode: "insensitive" } },
+                        { nickname: { contains: keyword, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
               ],
             }
             : {}),
