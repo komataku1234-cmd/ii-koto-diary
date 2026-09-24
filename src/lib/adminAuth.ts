@@ -7,6 +7,7 @@ const ADMIN_COOKIE_MAX_AGE = 60 * 60 * 12;
 
 // パスワードそのものをCookieに入れるのを避けるため、ハッシュ値だけをやり取りする。
 // ハッシュ値を16進数に変換してリターン
+// 2進数のままだとエラーになる可能性がある(数値の羅列じゃなくて文字コードとして読み込ませる)
 function adminAuthToken() {
   return createHash("sha256").update(process.env.ADMIN_PASSWORD ?? "").digest("hex");
 }
