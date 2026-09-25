@@ -1,10 +1,50 @@
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export const ADMIN_COOKIE_NAME = "admin_session";
 // 一定時間の目安として12時間。要件上は具体的な長さが未確定のため仮の値。
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 12;
+
+// 同じIPからのログイン試行がこの回数を超えたらロックする(6回目の試行から拒否)
+const MAX_LOGIN_ATTEMPTS = 5;
+// 試行を数える期間。この期間より古い記録は数えない(=時間が経てば自動でロックが解ける)
+const LOGIN_ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+
+// 接続元のIPアドレスを取得する。Vercelではx-forwarded-forにVercel側が実際のIPを設定する。
+// ヘッダーが無い環境(ローカル開発など)では"unknown"に集約する
+export async function getClientIp() {
+  const headerStore = await headers();
+  const forwarded = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwarded || headerStore.get("x-real-ip") || "unknown";
+}
+
+// ログインを試行するたびに、パスワードを確認する前に呼ぶ。この試行を記録した上で、ロック中かどうかを返す。
+// 「数えてから記録」だと、同時に大量に送られたときに上限を超えて通ってしまうため、
+// 「先に記録してから数える」順にして、同時送信でも通せるのは最初の数件までにしている
+export async function registerLoginAttempt(ip: string) {
+  const since = new Date(Date.now() - LOGIN_ATTEMPT_WINDOW_MS);
+
+  // 期間外の古い記録は、全IP分まとめて掃除する
+  await prisma.loginAttempt.deleteMany({ where: { createdAt: { lt: since } } });
+
+  const attempt = await prisma.loginAttempt.create({ data: { ip } });
+  const count = await prisma.loginAttempt.count({
+    where: { ip, createdAt: { gte: since } },
+  });
+
+  if (count > MAX_LOGIN_ATTEMPTS) {
+    // ロック中の試行は記録を残さない(攻撃で記録が際限なく増えるのを防ぐ)
+    await prisma.loginAttempt.deleteMany({ where: { id: attempt.id } });
+    return { locked: true };
+  }
+  return { locked: false };
+}
+
+// ログインに成功したら、そのIPの試行記録を消して数え直しにする
+export async function clearLoginAttempts(ip: string) {
+  await prisma.loginAttempt.deleteMany({ where: { ip } });
+}
 
 // DBにはトークンそのものではなくハッシュ値だけを保存する。
 // DBの中身が漏れても、ハッシュ値だけではログインに使えない(Cookieの値は作れない)ため。
