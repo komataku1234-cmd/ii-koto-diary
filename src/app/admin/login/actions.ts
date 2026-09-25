@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { setAdminAuthCookie } from "@/lib/adminAuth";
+import { createAdminSession } from "@/lib/adminAuth";
 
 export async function login(
   _prevState: { error?: string },
@@ -13,6 +13,6 @@ export async function login(
     return { error: "パスワードが正しくありません。" };
   }
 
-  await setAdminAuthCookie();
+  await createAdminSession();
   redirect("/admin");
 }
