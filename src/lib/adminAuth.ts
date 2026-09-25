@@ -41,6 +41,20 @@ export async function registerLoginAttempt(ip: string) {
   return { locked: false };
 }
 
+// ログアウト時に、DBのセッションを消してCookieも削除する。
+// DBの行を消すので、Cookieのトークンを別の場所にコピーされていても、その時点で使えなくなる
+export async function destroyAdminSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+  if (token) {
+    await prisma.adminSession.deleteMany({
+      where: { tokenHash: hashToken(token) },
+    });
+  }
+  // Cookieはpath: "/admin"で発行しているため、削除でも同じpathを指定する
+  cookieStore.delete({ name: ADMIN_COOKIE_NAME, path: "/admin" });
+}
+
 // ログインに成功したら、そのIPの試行記録を消して数え直しにする
 export async function clearLoginAttempts(ip: string) {
   await prisma.loginAttempt.deleteMany({ where: { ip } });
