@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createAdminSession } from "@/lib/adminAuth";
+import { createAdminSession, verifyAdminPassword } from "@/lib/adminAuth";
 
 export async function login(
   _prevState: { error?: string },
@@ -9,7 +9,7 @@ export async function login(
 ): Promise<{ error?: string }> {
   const password = formData.get("password");
 
-  if (typeof password !== "string" || password !== process.env.ADMIN_PASSWORD) {
+  if (typeof password !== "string" || !verifyAdminPassword(password)) {
     return { error: "パスワードが正しくありません。" };
   }
 

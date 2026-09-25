@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "crypto";
+import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
@@ -11,6 +11,24 @@ const ADMIN_SESSION_MAX_AGE = 60 * 60 * 12;
 // トークンは十分にランダムなので、パスワードと違って高速なSHA-256で問題ない。
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
+}
+
+// 入力されたパスワードが、環境変数ADMIN_PASSWORDと一致するかを確認する
+export function verifyAdminPassword(input: string) {
+  const expected = process.env.ADMIN_PASSWORD;
+
+  // 未設定・空のときは、入力が何であっても必ず拒否する(設定ミスで誰でも入れる状態を防ぐ)
+  if (!expected) {
+    console.error("ADMIN_PASSWORD が未設定または空のため、ログインを拒否しました。");
+    return false;
+  }
+
+  // timingSafeEqualは長さが違うとエラーになり、長さの違いから答えを推測される余地もあるため、
+  // 両方をSHA-256にして同じ長さ(32バイト)に揃えてから比べる。
+  // digest()にhexを指定しないのは、timingSafeEqualが文字列ではなくバイト列(Buffer)を受け取るため
+  const inputHash = createHash("sha256").update(input).digest();
+  const expectedHash = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(inputHash, expectedHash);
 }
 
 // Cookieのトークンに対応する、期限内のセッションがDBにあれば認証済みとみなす
