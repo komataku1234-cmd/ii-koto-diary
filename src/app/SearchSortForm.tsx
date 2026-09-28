@@ -18,7 +18,7 @@ export function SearchSortForm({
         type="text"
         name="q"
         defaultValue={keyword}
-        placeholder="本文・ニックネームで検索"
+        placeholder="本文・コメント・ニックネームで検索"
         className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
       />
       <select

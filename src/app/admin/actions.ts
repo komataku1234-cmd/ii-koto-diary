@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { destroyAdminSession, isAdminAuthenticated } from "@/lib/adminAuth";
 import { MAX_CONTENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/lib/constants";
 
 async function deletePost(formData: FormData) {
@@ -151,4 +151,11 @@ async function restoreReply(formData: FormData) {
   revalidatePath("/");
 }
 
-export { deletePost, updatePost, deleteReply, restorePost, restoreReply };
+async function logout() {
+  // 他の操作と違い、認証確認はしない。ログアウトは守るべき操作ではなく、
+  // 未認証で呼ばれても、消すセッションが無いだけで何も起きないため
+  await destroyAdminSession();
+  redirect("/admin/login");
+}
+
+export { deletePost, updatePost, deleteReply, restorePost, restoreReply, logout };

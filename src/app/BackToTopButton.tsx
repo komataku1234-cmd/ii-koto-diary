@@ -27,6 +27,7 @@ export function BackToTopButton() {
       type="button"
        // top: 0, behavior: "smooth" }: スクロール位置を0にして、スムーズにスクロールする
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      // aria-label: 見た目だけでは意味が伝わらないボタンへの説明
       aria-label="ページの先頭に戻る"
       // fixed → スクロールしても画面上の同じ位置に留まり続ける
       // items-center: 箱の中の高さ方向の中央に寄せる

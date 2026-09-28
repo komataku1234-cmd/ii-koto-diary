@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { deletePost, restorePost } from "./actions";
+import { deletePost, logout, restorePost } from "./actions";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -29,9 +29,19 @@ export default async function AdminPage() {
       {/* justify-between:両端に子要素を寄せて、余った隙間を要素の間だけに均等配置 */}
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">管理者画面 - 投稿一覧</h2>
-        <Link href="/" className="text-sm text-slate-500 hover:underline">
-          ← タイムラインに戻る
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-sm text-slate-500 hover:underline">
+            ← タイムラインに戻る
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="cursor-pointer text-sm text-slate-500 hover:underline"
+            >
+              ログアウト
+            </button>
+          </form>
+        </div>
       </div>
       {/* overflow-x-auto:横方向のはみ出しをスクロールバーで対応 今回でないように修正をかけたから多分出ることない*/}
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
